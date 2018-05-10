@@ -16,6 +16,8 @@ namespace MEMOServices
         clsDatabase ObjOrdDb = new clsDatabase();
         DataSet dsInformation = new DataSet();
 
+        #region "MEMO"
+
         #region "ClsAdmin"
 
         public DataSet GetEmployeeList(long MoGrpID)
@@ -289,6 +291,38 @@ namespace MEMOServices
             //    return null;
             //    WriteErrMsg("An error occurred while querying for WMI data: VolumeSerialNumber " + ex.Message);
             //}
+        }
+
+        public DataSet GetRegStatusByID(string EmpID, string StoreID, string StationID)
+        {
+            dsInformation = new DataSet();
+            ObjOrdDb = new clsDatabase();
+            OracleCommand OraCmd = new OracleCommand("CW_GETREGSTATUSBYID");
+            OraCmd.CommandType = CommandType.StoredProcedure;
+            OraCmd.Parameters.Add(new OracleParameter("EMPID", OracleType.VarChar, 25)).Value = EmpID;
+            OraCmd.Parameters.Add(new OracleParameter("STATIONID", OracleType.Number)).Value = StationID;
+            OraCmd.Parameters.Add(new OracleParameter("STOREID", OracleType.Number)).Value = StoreID;
+            OraCmd.Parameters.Add(new OracleParameter("CW1", OracleType.Cursor)).Direction = ParameterDirection.Output;
+            OraCmd.Parameters.Add(new OracleParameter("CW2", OracleType.Cursor)).Direction = ParameterDirection.Output;
+            try
+            {
+                dsInformation = ObjOrdDb.ProcedureExecuteDataset(OraCmd);
+                if ((dsInformation != null) && ((dsInformation.Tables.Count > 0) && (dsInformation.Tables[0].Rows.Count > 0)))
+                    return dsInformation;
+                else
+                    return null;
+                OraCmd.Dispose();
+            }
+            catch (Exception ex)
+            {
+                //clsCommon ObjCommon = new clsCommon();
+                //ObjCommon.WriteErrMsg("clsCommon: GetRegStatusByID()" + ex.Message);
+                return null;
+            }
+            finally
+            {
+                dsInformation.Dispose();
+            }
         }
 
         #endregion
@@ -1257,6 +1291,758 @@ namespace MEMOServices
                 //ObjCommon.WriteErrMsg(ex.Message);
             }
         }
+
+        #endregion
+
+        #endregion
+
+        #region CheckCashing
+
+        #region "clsAddstoretoGrp"
+
+        public bool UpdateGrpIdToStore(long grpID, long storeid)
+        {
+            try
+            {
+                string Str = string.Empty;
+                Str = "UPDATE STORE SET GRPID = " + grpID.ToString() + " WHERE ID = " + storeid.ToString();
+                DataSet Ds = new DataSet();
+                Ds = ExecuteTextQuery(Str);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                return default(Boolean);
+            }
+        }
+
+        public DataSet ExecuteTextQuery(string StrQuery)
+        {
+            try
+            {
+                OracleCommand OraCmd = new OracleCommand();
+                OraCmd.CommandType = CommandType.Text;
+                OraCmd.CommandText = StrQuery;
+                ObjOrdDb = new clsDatabase();
+                dsInformation = new DataSet();
+                dsInformation = ObjOrdDb.ProcedureExecuteDataset(OraCmd);
+                if ((dsInformation != null) && ((dsInformation.Tables.Count > 0) && (dsInformation.Tables[0].Rows.Count > 0)))
+                    return dsInformation;
+                else
+                    return null /* TODO Change to default(_) if this is not a reference type */;
+                OraCmd.Dispose();
+            }
+            catch (Exception ex)
+            {
+                return null /* TODO Change to default(_) if this is not a reference type */;
+                //ObjCommon = new clsCommon();
+                //ObjCommon.WriteErrMsg("clsReports: ExecuteTextQuery() : " + ex.Message);
+            }
+            finally
+            {
+                dsInformation.Dispose();
+            }
+        }
+
+        #endregion
+
+        #region "clscashTrans"
+
+        public DataSet GetAllStations(string sysdate, int StoreID)
+        {
+            OracleCommand OraCmd = new OracleCommand("CW_GETALLSTATION");
+            OraCmd.CommandType = CommandType.StoredProcedure;
+            OraCmd.Parameters.Add(new OracleParameter("CwOut", OracleType.Cursor)).Direction = ParameterDirection.Output;
+            OraCmd.Parameters.Add(new OracleParameter("CwOut1", OracleType.Cursor)).Direction = ParameterDirection.Output;
+            OraCmd.Parameters.Add(new OracleParameter("pSTORE", OracleType.Number)).Value = StoreID;
+            OraCmd.Parameters.Add(new OracleParameter("pSYSDATE", OracleType.VarChar)).Value = System.Convert.ToDateTime(sysdate).ToString("dd-MMM-yy");
+            try
+            {
+                ObjOrdDb = new clsDatabase();
+                dsInformation = new DataSet();
+                dsInformation = ObjOrdDb.ProcedureExecuteDataset(OraCmd);
+                if ((dsInformation != null) && ((dsInformation.Tables.Count > 0) && (dsInformation.Tables[0].Rows.Count > 0)))
+                    return dsInformation;
+                else
+                    return null;
+                OraCmd.Dispose();
+            }
+            catch (Exception ex)
+            {
+                return null;
+                //objcommon = new clsCommon();
+                //objcommon.WriteErrMsg("clscashTrans: GetAllStations()" + ex.Message);
+                //return null /* TODO Change to default(_) if this is not a reference type */;
+            }
+            finally
+            {
+                dsInformation.Dispose();
+            }
+        }
+
+        public long InsertCashTransactions(int pSTATIONFROM, int pSTATIONTO, double pAMOUNT, long pEMPID, long pTRANSFER_EMP_ID, long pSHIFTID, long pSOTREID, string sysdate, string Remark)
+        {
+            int returnVal = 0;
+            OracleCommand oracmd = new OracleCommand("CW_INSERTCASHTRANS");
+            oracmd.CommandType = System.Data.CommandType.StoredProcedure;
+            oracmd.Parameters.Add(new OracleParameter("pSTATIONFROM", OracleType.Number)).Value = pSTATIONFROM;
+            oracmd.Parameters.Add(new OracleParameter("pSTATIONTO", OracleType.Number)).Value = pSTATIONTO;
+            oracmd.Parameters.Add(new OracleParameter("pAMOUNT", OracleType.Number)).Value = pAMOUNT;
+            oracmd.Parameters.Add(new OracleParameter("pEMPID", OracleType.Number)).Value = pEMPID;
+            oracmd.Parameters.Add(new OracleParameter("pTRANSFER_EMP_ID", OracleType.Number)).Value = pTRANSFER_EMP_ID;
+            oracmd.Parameters.Add(new OracleParameter("pSHIFTID", OracleType.Number)).Value = pSHIFTID;
+            oracmd.Parameters.Add(new OracleParameter("pSOTREID", OracleType.Number)).Value = pSOTREID;
+            oracmd.Parameters.Add(new OracleParameter("pSYSDATE", OracleType.VarChar)).Value = System.Convert.ToDateTime(sysdate).ToString("dd-MMM-yy");
+            oracmd.Parameters.Add(new OracleParameter("pREMARK", OracleType.VarChar, 2000)).Value = Remark;
+            oracmd.Parameters.Add(new OracleParameter("POUTID", OracleType.Number)).Direction = ParameterDirection.Output;
+            ObjOrdDb = new clsDatabase();
+            try
+            {
+                if (ObjOrdDb.ProcedureExecutescaler(oracmd))
+                {
+                    returnVal = Convert.ToInt32(oracmd.Parameters["POUTID"].Value.ToString());
+                    return returnVal;
+                }
+                else
+                    return 0;
+            }
+            catch (Exception ex)
+            {
+                //objcommon.WriteErrMsg("clscashTrans : INSERT_CASHTRANS :" + ex.Message + vbNewLine + DateTime.Now.ToString + vbNewLine);
+                return 0;
+            }
+            finally
+            {
+                oracmd.Dispose();
+            }
+        }
+
+        public DataSet GetReceivedCash(string sysdate, int StoreID, int StationID)
+        {
+            OracleCommand oraCmd = new OracleCommand("CW_GETCASHRECEIVEDST");
+            oraCmd.CommandType = System.Data.CommandType.StoredProcedure;
+            oraCmd.Parameters.Add(new OracleParameter("pCW", OracleType.Cursor)).Direction = ParameterDirection.Output;
+            oraCmd.Parameters.Add(new OracleParameter("pSTDT", OracleType.VarChar)).Value = System.Convert.ToDateTime(sysdate).ToString("dd-MMM-yy");
+            oraCmd.Parameters.Add(new OracleParameter("pSTID", OracleType.Number)).Value = StationID;
+            oraCmd.Parameters.Add(new OracleParameter("pSHIFTID", OracleType.Number)).Value = 1;
+            oraCmd.Parameters.Add(new OracleParameter("pSTOREID", OracleType.Number)).Value = StoreID;
+            try
+            {
+                ObjOrdDb = new clsDatabase();
+                dsInformation = ObjOrdDb.ProcedureExecuteDataset(oraCmd);
+                if ((dsInformation != null) && ((dsInformation.Tables.Count > 0) && (dsInformation.Tables[0].Rows.Count > 0)))
+                    return dsInformation;
+                else
+                    return null;
+                oraCmd.Dispose();
+            }
+            catch (Exception ex)
+            {
+                return null /* TODO Change to default(_) if this is not a reference type */;
+                //objcommon.WriteErrMsg("clscashTrans: GetReceivedCash()" + ex.Message);
+            }
+            finally
+            {
+                dsInformation.Dispose();
+            }
+        }
+
+        public DataSet GetTransCash(string sysdate, int StoreID, int StationID)
+        {
+            OracleCommand oraCmd = new OracleCommand("CW_GETCASHTRNST");
+            oraCmd.CommandType = System.Data.CommandType.StoredProcedure;
+            oraCmd.Parameters.Add(new OracleParameter("pCW", OracleType.Cursor)).Direction = ParameterDirection.Output;
+            oraCmd.Parameters.Add(new OracleParameter("pSTDT", OracleType.VarChar)).Value = System.Convert.ToDateTime(sysdate).ToString("dd-MMM-yy");
+            oraCmd.Parameters.Add(new OracleParameter("pSTID", OracleType.Number)).Value = StationID;
+            oraCmd.Parameters.Add(new OracleParameter("pSHIFTID", OracleType.Number)).Value = 1;
+            oraCmd.Parameters.Add(new OracleParameter("pSTOREID", OracleType.Number)).Value = StoreID;
+            try
+            {
+                ObjOrdDb = new clsDatabase();
+                dsInformation = ObjOrdDb.ProcedureExecuteDataset(oraCmd);
+                if ((dsInformation != null) && ((dsInformation.Tables.Count > 0) && (dsInformation.Tables[0].Rows.Count > 0)))
+                    return dsInformation;
+                else
+                    return null;
+                oraCmd.Dispose();
+            }
+            catch (Exception ex)
+            {
+                return null /* TODO Change to default(_) if this is not a reference type */;
+                //objcommon.WriteErrMsg("clscashTrans: GetTransCash()" + ex.Message);
+            }
+            finally
+            {
+                dsInformation.Dispose();
+            }
+        }
+
+        //From Here Code Comes for VAULT TRANSACTION
+
+        public DataSet GetVaultTransDetail(string sysdate, string EmpID, int StoreID, int StationID)
+        {
+            OracleCommand oraCmd = new OracleCommand("CW_GETVAULTTRANSDETAIL1");
+            oraCmd.CommandType = System.Data.CommandType.StoredProcedure;
+            oraCmd.Parameters.Add(new OracleParameter("CwOut", OracleType.Cursor)).Direction = ParameterDirection.Output;
+            oraCmd.Parameters.Add(new OracleParameter("CwOut1", OracleType.Cursor)).Direction = ParameterDirection.Output;
+            oraCmd.Parameters.Add(new OracleParameter("CwOut2", OracleType.Cursor)).Direction = ParameterDirection.Output;
+            oraCmd.Parameters.Add(new OracleParameter("pEMPID", OracleType.VarChar)).Value = EmpID.ToString().Trim();
+            oraCmd.Parameters.Add(new OracleParameter("pSTOREID", OracleType.Number)).Value = StoreID;
+            oraCmd.Parameters.Add(new OracleParameter("pSTATIONID", OracleType.Number)).Value = StationID;
+            oraCmd.Parameters.Add(new OracleParameter("pSHIFTID", OracleType.Number)).Value = 1;
+            oraCmd.Parameters.Add(new OracleParameter("pSTDT", OracleType.VarChar)).Value = System.Convert.ToDateTime(sysdate).ToString("dd-MMM-yy");
+            try
+            {
+                ObjOrdDb = new clsDatabase();
+                dsInformation = ObjOrdDb.ProcedureExecuteDataset(oraCmd);
+                if ((dsInformation != null) && ((dsInformation.Tables.Count > 0) && (dsInformation.Tables[0].Rows.Count > 0)))
+                    return dsInformation;
+                else
+                    return null;
+                oraCmd.Dispose();
+            }
+            catch (Exception ex)
+            {
+                return null /* TODO Change to default(_) if this is not a reference type */;
+                //objcommon.WriteErrMsg("clscashTrans : GetVaultTransDetail :" + ex.Message);
+            }
+            finally
+            {
+                dsInformation.Dispose();
+            }
+        }
+
+        public DataSet GetVaultTransDetailForVault(string sysdate, string EmpID, int StoreID, int StationID)
+        {
+            OracleCommand oraCmd = new OracleCommand("CW_GETVAULTTRANSDETAIL2");
+            oraCmd.CommandType = System.Data.CommandType.StoredProcedure;
+            oraCmd.Parameters.Add(new OracleParameter("CwOut", OracleType.Cursor)).Direction = ParameterDirection.Output;
+            oraCmd.Parameters.Add(new OracleParameter("CwOut1", OracleType.Cursor)).Direction = ParameterDirection.Output;
+            oraCmd.Parameters.Add(new OracleParameter("CwOut2", OracleType.Cursor)).Direction = ParameterDirection.Output;
+            oraCmd.Parameters.Add(new OracleParameter("pEMPID", OracleType.VarChar)).Value = EmpID.ToString().Trim();
+            oraCmd.Parameters.Add(new OracleParameter("pSTOREID", OracleType.Number)).Value = StoreID;
+            oraCmd.Parameters.Add(new OracleParameter("pSTATIONID", OracleType.Number)).Value = StationID;
+            oraCmd.Parameters.Add(new OracleParameter("pSHIFTID", OracleType.Number)).Value = 1;
+            oraCmd.Parameters.Add(new OracleParameter("pSTDT", OracleType.VarChar)).Value = System.Convert.ToDateTime(sysdate).ToString("dd-MMM-yy");
+            try
+            {
+                ObjOrdDb = new clsDatabase();
+                dsInformation = ObjOrdDb.ProcedureExecuteDataset(oraCmd);
+                if ((dsInformation != null) && ((dsInformation.Tables.Count > 0) && (dsInformation.Tables[0].Rows.Count > 0)))
+                    return dsInformation;
+                else
+                    return null;
+                oraCmd.Dispose();
+            }
+            catch (Exception ex)
+            {
+                return null /* TODO Change to default(_) if this is not a reference type */;
+                //objcommon.WriteErrMsg("clscashTrans : GetVaultTransDetail :" + ex.Message);
+            }
+            finally
+            {
+                dsInformation.Dispose();
+            }
+        }
+
+        public bool InsertVault(int pSTATIONFROM, int pSTATIONTO, double pAMOUNT, long pEMPID, long pTRANSFER_EMP_ID, long pSHIFTID, long pSOTREID, string sysdate, string Remark, int OneD, int FiveD, int TenD, int TwentyD, int FiftyD, int HundredD, int OneC, int FiveC, int TenC, int TwntyFiveC, int FiftyC, string Mode, char Flag)
+        {
+            OracleCommand oracmd = new OracleCommand("CW_INSERTCASHTRANSVAULT1");
+            oracmd.CommandType = System.Data.CommandType.StoredProcedure;
+            oracmd.Parameters.Add(new OracleParameter("pSTATIONFROM", OracleType.Number)).Value = pSTATIONFROM;
+            oracmd.Parameters.Add(new OracleParameter("pSTATIONTO", OracleType.Number)).Value = pSTATIONTO;
+            oracmd.Parameters.Add(new OracleParameter("pAMOUNT", OracleType.Number)).Value = pAMOUNT;
+            oracmd.Parameters.Add(new OracleParameter("pEMPID", OracleType.Number)).Value = pEMPID;
+            oracmd.Parameters.Add(new OracleParameter("pTRANSFER_EMP_ID", OracleType.Number)).Value = pTRANSFER_EMP_ID;
+            oracmd.Parameters.Add(new OracleParameter("pSHIFTID", OracleType.Number)).Value = pSHIFTID;
+            oracmd.Parameters.Add(new OracleParameter("pSOTREID", OracleType.Number)).Value = pSOTREID;
+            oracmd.Parameters.Add(new OracleParameter("pSYSDATE", OracleType.VarChar)).Value = System.Convert.ToDateTime(sysdate).ToString("dd-MMM-yy");
+            oracmd.Parameters.Add(new OracleParameter("pREMARK", OracleType.VarChar, 2000)).Value = Remark;
+            oracmd.Parameters.Add(new OracleParameter("pONED", OracleType.Number)).Value = OneD;
+            oracmd.Parameters.Add(new OracleParameter("pFIVED", OracleType.Number)).Value = FiveD;
+            oracmd.Parameters.Add(new OracleParameter("pTEND", OracleType.Number)).Value = TenD;
+            oracmd.Parameters.Add(new OracleParameter("pTWENTYD", OracleType.Number)).Value = TwentyD;
+            oracmd.Parameters.Add(new OracleParameter("pFIFTYD", OracleType.Number)).Value = FiftyD;
+            oracmd.Parameters.Add(new OracleParameter("pHUNDREDD", OracleType.Number)).Value = HundredD;
+            oracmd.Parameters.Add(new OracleParameter("pONEC", OracleType.Number)).Value = OneC;
+            oracmd.Parameters.Add(new OracleParameter("pFIVEC", OracleType.Number)).Value = FiveC;
+            oracmd.Parameters.Add(new OracleParameter("pTENC", OracleType.Number)).Value = TenC;
+            oracmd.Parameters.Add(new OracleParameter("pTWENTYFIVEC", OracleType.Number)).Value = TwntyFiveC;
+            oracmd.Parameters.Add(new OracleParameter("pFIFTYC", OracleType.Number)).Value = FiftyC;
+            oracmd.Parameters.Add(new OracleParameter("pMODE", OracleType.VarChar)).Value = Mode;
+            oracmd.Parameters.Add(new OracleParameter("pFLAG", OracleType.Char, 5)).Value = Flag;
+            ObjOrdDb = new clsDatabase();
+            try
+            {
+                if (ObjOrdDb.ProcedureExecute(oracmd) == true)
+                    return true;
+                else
+                    return false;
+                oracmd.Dispose();
+            }
+            catch (Exception ex)
+            {
+                //objcommon.WriteErrMsg("clscashTrans : InsertVault :" + ex.Message);
+                return false;
+            }
+            finally
+            {
+                oracmd.Dispose();
+            }
+        }
+
+        #endregion
+
+        #region "clsChecks"
+
+        public DataSet GetAllServices()
+        {
+            ObjOrdDb = new clsDatabase();
+            dsInformation = new DataSet();
+            OracleCommand OraCmd = new OracleCommand("CW_GETALLSERVICES");
+            OraCmd.CommandType = CommandType.StoredProcedure;
+            OraCmd.Parameters.Add(new OracleParameter("pSERVICE", OracleType.Cursor)).Direction = ParameterDirection.Output;
+            try
+            {
+                dsInformation = ObjOrdDb.ProcedureExecuteDataset(OraCmd);
+                if ((dsInformation != null) && ((dsInformation.Tables.Count > 0) && (dsInformation.Tables[0].Rows.Count > 0)))
+                    return dsInformation;
+                else
+                    return null;
+
+                OraCmd.Dispose();
+            }
+            catch (Exception ex)
+            {
+                //ObjCommon = new clsCommon();
+                //ObjCommon.WriteErrMsg("clsChecks: GetAllService()" + ex.Message);
+                return null;
+            }
+            finally
+            {
+                dsInformation.Dispose();
+            }
+        }
+
+        public bool InsertTempData(long SID, long EmpID, long ShiftID, string SType, long StID, long CustId, int PayMode, long Qty, double Disc, double Price, double Fees, double Amount, long RwID, long StoreID, double ServiceComm, double StoreComm)
+        {
+            try
+            {
+                OracleCommand OraCmd = new OracleCommand("SAVE_TEMPDATA");
+                OraCmd.CommandType = CommandType.StoredProcedure;
+                OraCmd.Parameters.Add(new OracleParameter("SERVICEID", OracleType.VarChar)).Value = SID;
+                OraCmd.Parameters.Add(new OracleParameter("EMPID", OracleType.VarChar)).Value = EmpID;
+                OraCmd.Parameters.Add(new OracleParameter("SHIFTID", OracleType.VarChar)).Value = ShiftID;
+                OraCmd.Parameters.Add(new OracleParameter("STYPE", OracleType.VarChar)).Value = SType.Trim();
+                OraCmd.Parameters.Add(new OracleParameter("STATIONID", OracleType.VarChar)).Value = StID;
+                OraCmd.Parameters.Add(new OracleParameter("CUSTID", OracleType.Number)).Value = CustId;
+                OraCmd.Parameters.Add(new OracleParameter("PMODE", OracleType.Char)).Value = PayMode;
+                OraCmd.Parameters.Add(new OracleParameter("TQTY", OracleType.Number)).Value = Qty;
+                OraCmd.Parameters.Add(new OracleParameter("TDISC", OracleType.Number)).Value = Disc;
+                OraCmd.Parameters.Add(new OracleParameter("TPRICE", OracleType.Number)).Value = Price;
+                OraCmd.Parameters.Add(new OracleParameter("TFEES", OracleType.Number)).Value = Fees;
+                OraCmd.Parameters.Add(new OracleParameter("SERFEE", OracleType.Number)).Value = ServiceComm;
+                OraCmd.Parameters.Add(new OracleParameter("STRFEE", OracleType.Number)).Value = StoreComm;
+                OraCmd.Parameters.Add(new OracleParameter("TAMOUNT", OracleType.Number)).Value = Amount;
+                OraCmd.Parameters.Add(new OracleParameter("RID", OracleType.Number)).Value = RwID;
+                OraCmd.Parameters.Add(new OracleParameter("STOREID", OracleType.Number)).Value = StoreID;
+                ObjOrdDb = new clsDatabase();
+                if (ObjOrdDb.ProcedureExecute(OraCmd) == true)
+                    return true;
+                else
+                    return false;
+                OraCmd.Dispose();
+            }
+            catch (Exception ex)
+            {
+                return false;
+                //ObjCommon = new clsCommon();
+                //ObjCommon.WriteErrMsg("clsChecks: InsertTempData" + ex.Message);
+            }
+        }
+
+        public bool DeleteTempData(long EmpID, long ShiftID, long StID, long RwID, long StoreID, string Flag)
+        {
+            try
+            {
+                OracleCommand OraCmd = new OracleCommand("CW_DELETETEMPDATA2");
+                OraCmd.CommandType = CommandType.StoredProcedure;
+                OraCmd.Parameters.Add(new OracleParameter("EMPID", OracleType.VarChar, 2000)).Value = EmpID;
+                OraCmd.Parameters.Add(new OracleParameter("SHIFTID", OracleType.VarChar, 200)).Value = ShiftID;
+                OraCmd.Parameters.Add(new OracleParameter("STATIONID", OracleType.VarChar, 200)).Value = StID;
+                OraCmd.Parameters.Add(new OracleParameter("FLAG", OracleType.VarChar, 2000)).Value = Flag;
+                OraCmd.Parameters.Add(new OracleParameter("RID", OracleType.Number)).Value = RwID;
+                OraCmd.Parameters.Add(new OracleParameter("STOREID", OracleType.Number)).Value = StoreID;
+                ObjOrdDb = new clsDatabase();
+                if (ObjOrdDb.ProcedureExecute(OraCmd) == true)
+                    return true;
+                else
+                    return false;
+                OraCmd.Dispose();
+            }
+            catch (Exception ex)
+            {
+                return false;
+                //ObjCommon = new clsCommon();
+                //ObjCommon.WriteErrMsg("clsChecks: DeleteTempData" + ex.Message);
+            }
+        }
+
+        public bool InsertTrans(long SID, string SType, long TransQty, double TransPrice, double TransFee, double TransDisc, double TransAmt, int PayMode, long EmpID, long ShiftID, long StID, long CreatedBy, string AcNo, long CustId, long PaymentID, System.DateTime SDate, Int16 RwId, long SarID, double ServiceFee, double StoreFee, int StoreID)
+        {
+            try
+            {
+                OracleCommand OraCmd = new OracleCommand("CW_SAVETRANS1");
+                OraCmd.CommandType = CommandType.StoredProcedure;
+                OraCmd.Parameters.Add(new OracleParameter("SERVICE_ID", OracleType.Number)).Value = SID;
+                OraCmd.Parameters.Add(new OracleParameter("SERVICETYPE", OracleType.VarChar)).Value = SType.Trim();
+                OraCmd.Parameters.Add(new OracleParameter("TRANS_DT", OracleType.DateTime)).Value = SDate;
+                OraCmd.Parameters.Add(new OracleParameter("TRANSQTY", OracleType.Number)).Value = TransQty;
+                OraCmd.Parameters.Add(new OracleParameter("TRANSPRICE", OracleType.Number)).Value = TransPrice;
+                OraCmd.Parameters.Add(new OracleParameter("TRANSFEES", OracleType.Number)).Value = TransFee;
+                OraCmd.Parameters.Add(new OracleParameter("TRANSDISC", OracleType.Number)).Value = TransDisc;
+                OraCmd.Parameters.Add(new OracleParameter("TRANSAMT", OracleType.Number)).Value = TransAmt;
+                OraCmd.Parameters.Add(new OracleParameter("PAYMENTMODE", OracleType.Char)).Value = PayMode;
+                OraCmd.Parameters.Add(new OracleParameter("EMPID", OracleType.Number)).Value = EmpID;
+                OraCmd.Parameters.Add(new OracleParameter("SHIFTID", OracleType.Number)).Value = ShiftID;
+                OraCmd.Parameters.Add(new OracleParameter("STATIONID", OracleType.Number)).Value = StID;
+                OraCmd.Parameters.Add(new OracleParameter("CREATEDBY", OracleType.Number)).Value = CreatedBy;
+                OraCmd.Parameters.Add(new OracleParameter("CREATEDON", OracleType.DateTime)).Value = SDate;
+                OraCmd.Parameters.Add(new OracleParameter("ACCOUNTNUMBER", OracleType.VarChar)).Value = AcNo.Trim();
+                OraCmd.Parameters.Add(new OracleParameter("CUSTOMERID", OracleType.Number)).Value = CustId;
+                OraCmd.Parameters.Add(new OracleParameter("PAYMENT_ID", OracleType.Number)).Value = PaymentID;
+                OraCmd.Parameters.Add(new OracleParameter("SARID", OracleType.Number)).Value = SarID;
+                OraCmd.Parameters.Add(new OracleParameter("STOREID", OracleType.Number)).Value = StoreID;
+                OraCmd.Parameters.Add(new OracleParameter("RID", OracleType.Number)).Value = RwId;
+                OraCmd.Parameters.Add(new OracleParameter("SERVICEFEE", OracleType.Number)).Value = ServiceFee;
+                OraCmd.Parameters.Add(new OracleParameter("STOREFEE", OracleType.Number)).Value = StoreFee;
+                ObjOrdDb = new clsDatabase();
+                if (ObjOrdDb.ProcedureExecute(OraCmd) == true)
+                    return true;
+                else
+                    return false;
+                OraCmd.Dispose();
+            }
+            catch (Exception ex)
+            {
+                return false;
+                //ObjCommon = new clsCommon();
+                //ObjCommon.WriteErrMsg("clsChecks: InsertTrans" + ex.Message);
+            }
+        }
+
+        public long InsertPayment(double TAmt, double STax, double Disc, double Cash, double Check, double CC, double TotalAmt, double Change, long EmpID, long ShiftID, long StID, System.DateTime Dt, int StoreID)
+        {
+            try
+            {
+                long TransID;
+                OracleCommand OraCmd = new OracleCommand("CW_SAVETRANSPAYMENT");
+                OraCmd.CommandType = CommandType.StoredProcedure;
+                OraCmd.Parameters.Add(new OracleParameter("TRANS_DT", OracleType.DateTime)).Value = Dt;
+                OraCmd.Parameters.Add(new OracleParameter("TRANS_AMT", OracleType.Double)).Value = TAmt;
+                OraCmd.Parameters.Add(new OracleParameter("TRANS_SALESTAX", OracleType.Double)).Value = STax;
+                OraCmd.Parameters.Add(new OracleParameter("TRANS_DISC", OracleType.Double)).Value = Disc;
+                OraCmd.Parameters.Add(new OracleParameter("TRANS_CASH", OracleType.Double)).Value = Cash;
+                OraCmd.Parameters.Add(new OracleParameter("TRANS_CHECK", OracleType.Double)).Value = Check;
+                OraCmd.Parameters.Add(new OracleParameter("TRANS_CC", OracleType.Double)).Value = CC;
+                OraCmd.Parameters.Add(new OracleParameter("TRANS_TOTAL", OracleType.Double)).Value = TotalAmt;
+                OraCmd.Parameters.Add(new OracleParameter("TRANS_CHANGE", OracleType.Double)).Value = Change;
+                OraCmd.Parameters.Add(new OracleParameter("EMPID", OracleType.Number)).Value = EmpID;
+                OraCmd.Parameters.Add(new OracleParameter("SHIFTID", OracleType.Number)).Value = ShiftID;
+                OraCmd.Parameters.Add(new OracleParameter("STATIONID", OracleType.Number)).Value = StID;
+                OraCmd.Parameters.Add(new OracleParameter("STOREID", OracleType.Number)).Value = StoreID;
+                OraCmd.Parameters.Add(new OracleParameter("TRANS_id", OracleType.Number)).Direction = ParameterDirection.Output;
+                ObjOrdDb = new clsDatabase();
+                if (ObjOrdDb.ProcedureExecutescaler(OraCmd) == true)
+                {
+                    TransID = Convert.ToInt64(OraCmd.Parameters["TRANS_id"].Value.ToString());
+                    return TransID;
+                }
+                else
+                    return 0;
+                OraCmd.Dispose();
+            }
+            catch (Exception ex)
+            {
+                return 0;
+                //ObjCommon = new clsCommon();
+                //ObjCommon.WriteErrMsg("clsChecks: InsertPayment" + ex.Message);
+            }
+        }
+
+        public DataSet GetAllTempData(int StoreID, int StationID)
+        {
+            dsInformation = new DataSet();
+            ObjOrdDb = new clsDatabase();
+            OracleCommand OraCmd = new OracleCommand("CW_GETALLTEMPDATA");
+            OraCmd.CommandType = CommandType.StoredProcedure;
+            OraCmd.Parameters.Add(new OracleParameter("pSTORE", OracleType.Number)).Value = StoreID;
+            OraCmd.Parameters.Add(new OracleParameter("pSTATION", OracleType.Number)).Value = StationID;
+            OraCmd.Parameters.Add(new OracleParameter("pTEMP", OracleType.Cursor)).Direction = ParameterDirection.Output;
+            try
+            {
+                dsInformation = ObjOrdDb.ProcedureExecuteDataset(OraCmd);
+                if ((dsInformation != null) && ((dsInformation.Tables.Count > 0) && (dsInformation.Tables[0].Rows.Count > 0)))
+                    return dsInformation;
+                else
+                    return null;
+                OraCmd.Dispose();
+            }
+            catch (Exception ex)
+            {
+                //ObjCommon = new clsCommon();
+                //ObjCommon.WriteErrMsg("clsChecks: GetAllTempData()" + ex.Message);
+                return null;
+            }
+            finally
+            {
+                dsInformation.Dispose();
+            }
+        }
+
+        public DataSet GetServicesByStoreID(int StoreID)
+        {
+            dsInformation = new DataSet();
+            ObjOrdDb = new clsDatabase();
+            OracleCommand OraCmd = new OracleCommand("CW_GETSERVICESBYSTOREID");
+            OraCmd.CommandType = CommandType.StoredProcedure;
+            OraCmd.Parameters.Add(new OracleParameter("pSTORE", OracleType.Number)).Value = StoreID;
+            OraCmd.Parameters.Add(new OracleParameter("pSERVICE", OracleType.Cursor)).Direction = ParameterDirection.Output;
+            try
+            {
+                dsInformation = ObjOrdDb.ProcedureExecuteDataset(OraCmd);
+                if ((dsInformation != null) && ((dsInformation.Tables.Count > 0) && (dsInformation.Tables[0].Rows.Count > 0)))
+                    return dsInformation;
+                else
+                    return null;
+                OraCmd.Dispose();
+            }
+            catch (Exception ex)
+            {
+                //ObjCommon = new clsCommon();
+                //ObjCommon.WriteErrMsg("clsChecks: GetServicesByStoreID()" + ex.Message);
+                return null;
+            }
+            finally
+            {
+                dsInformation.Dispose();
+            }
+        }
+
+        public DataSet GetPOSButtonsByStoreID(int StoreID)
+        {
+            dsInformation = new DataSet();
+            ObjOrdDb = new clsDatabase();
+            OracleCommand OraCmd = new OracleCommand("CW_GETPOSBYSTOREID");
+            OraCmd.CommandType = CommandType.StoredProcedure;
+            OraCmd.Parameters.Add(new OracleParameter("cwSTORE", OracleType.Number)).Value = StoreID;
+            OraCmd.Parameters.Add(new OracleParameter("cwPOS", OracleType.Cursor)).Direction = ParameterDirection.Output;
+            try
+            {
+                dsInformation = ObjOrdDb.ProcedureExecuteDataset(OraCmd);
+                if ((dsInformation != null) && ((dsInformation.Tables.Count > 0) && (dsInformation.Tables[0].Rows.Count > 0)))
+                    return dsInformation;
+                else
+                    return null;
+                OraCmd.Dispose();
+            }
+            catch (Exception ex)
+            {
+                //ObjCommon = new clsCommon();
+                //ObjCommon.WriteErrMsg("clsChecks: GetPOSButtonsByStoreID()" + ex.Message);
+                return null;
+            }
+            finally
+            {
+                dsInformation.Dispose();
+            }
+        }
+
+        #endregion
+
+        #region "clsDeposit"
+
+        public DataSet GetChecksDeposit(int STID, int EmpID, int StoreID)
+        {
+            try
+            {
+                dsInformation = new DataSet();
+                ObjOrdDb = new clsDatabase();
+                OracleCommand OraCmd = new OracleCommand("CHK_GETCHECKSDEPOSIT");
+                OraCmd.CommandType = CommandType.StoredProcedure;
+                OraCmd.Parameters.Add(new OracleParameter("POUT", OracleType.Cursor)).Direction = ParameterDirection.Output;
+                OraCmd.Parameters.Add(new OracleParameter("EID", OracleType.Number)).Value = EmpID;
+                OraCmd.Parameters.Add(new OracleParameter("SFTID", OracleType.Number)).Value = 1;
+                OraCmd.Parameters.Add(new OracleParameter("pSTOREID", OracleType.Number)).Value = StoreID;
+                OraCmd.Parameters.Add(new OracleParameter("ST_ID", OracleType.Number)).Value = STID;
+                dsInformation = ObjOrdDb.ProcedureExecuteDataset(OraCmd);
+                if ((dsInformation != null) && ((dsInformation.Tables.Count > 0) && (dsInformation.Tables[0].Rows.Count > 0)))
+                    return dsInformation;
+                else
+                    return null;
+                OraCmd.Dispose();
+            }
+            catch (Exception ex)
+            {
+                return null;
+                //ObjCommon = new clsCommon();
+                //ObjCommon.WriteErrMsg("clsDeposit: GetChecksDeposit() : " + ex.Message);
+            }
+            finally
+            {
+                dsInformation.Dispose();
+            }
+        }
+
+        public DataSet GetChecksDepositForMaker(int STID, int StoreID)
+        {
+            try
+            {
+                dsInformation = new DataSet();
+                ObjOrdDb = new clsDatabase();
+                OracleCommand OraCmd = new OracleCommand("CHK_GETCHECKSDEPOSIT");
+                OraCmd.CommandType = CommandType.StoredProcedure;
+                OraCmd.Parameters.Add(new OracleParameter("POUT", OracleType.Cursor)).Direction = ParameterDirection.Output;
+                OraCmd.Parameters.Add(new OracleParameter("EID", OracleType.Number)).Value = 0;
+                OraCmd.Parameters.Add(new OracleParameter("SFTID", OracleType.Number)).Value = 1;
+                OraCmd.Parameters.Add(new OracleParameter("pSTOREID", OracleType.Number)).Value = StoreID;
+                OraCmd.Parameters.Add(new OracleParameter("ST_ID", OracleType.Number)).Value = STID;
+                dsInformation = ObjOrdDb.ProcedureExecuteDataset(OraCmd);
+                if ((dsInformation != null) && ((dsInformation.Tables.Count > 0) && (dsInformation.Tables[0].Rows.Count > 0)))
+                    return dsInformation;
+                else
+                    return null;
+                OraCmd.Dispose();
+            }
+            catch (Exception ex)
+            {
+                return null;
+                //ObjCommon = new clscommon();
+                //ObjCommon.WriteErrMsg("clsDeposit: GetChecksDeposit() : " + ex.Message);
+            }
+            finally
+            {
+                dsInformation.Dispose();
+            }
+        }
+
+        public bool DeleteChecks(long Tid, double Amt, int StationID, int EmpID)
+        {
+            try
+            {
+                dsInformation = new DataSet();
+                ObjOrdDb = new clsDatabase();
+                OracleCommand OraCmd = new OracleCommand("CHK_DELETECHECKS");
+                OraCmd.CommandType = CommandType.StoredProcedure;
+                OraCmd.Parameters.Add(new OracleParameter("TID", OracleType.Number)).Value = Tid;
+                OraCmd.Parameters.Add(new OracleParameter("AMT", OracleType.Number)).Value = Amt;
+                OraCmd.Parameters.Add(new OracleParameter("EMPID", OracleType.Number)).Value = EmpID;
+                OraCmd.Parameters.Add(new OracleParameter("SHIFTID", OracleType.Number)).Value = 1;
+                OraCmd.Parameters.Add(new OracleParameter("STATIONID", OracleType.Number)).Value = StationID;
+                if (ObjOrdDb.ProcedureExecute(OraCmd) == true)
+                    return true;
+                else
+                    return false;
+            }
+            catch (Exception ex)
+            {
+                return false;
+                //ObjCommon = new clscommon();
+                //ObjCommon.WriteErrMsg("clsDeposit: DeleteChecks() : " + ex.Message);
+            }
+        }
+
+        public bool DeleteTransaction(long Tid, string Dt, string EmpID, int StoreID, int StationID)
+        {
+            try
+            {
+                dsInformation = new DataSet();
+                ObjOrdDb = new clsDatabase();
+                OracleCommand OraCmd = new OracleCommand("CHK_DELETETRANS");
+                OraCmd.CommandType = CommandType.StoredProcedure;
+                OraCmd.Parameters.Add(new OracleParameter("TRANSID", OracleType.Number)).Value = Tid;
+                OraCmd.Parameters.Add(new OracleParameter("EMPID", OracleType.VarChar, 200)).Value = EmpID.ToString().Trim();
+                OraCmd.Parameters.Add(new OracleParameter("SHIFTID", OracleType.Number)).Value = 1;
+                OraCmd.Parameters.Add(new OracleParameter("STATIONID", OracleType.Number)).Value = StationID;
+                OraCmd.Parameters.Add(new OracleParameter("STOREID", OracleType.Number)).Value = StoreID;
+                OraCmd.Parameters.Add(new OracleParameter("STDT", OracleType.VarChar, 200)).Value = Dt;
+                if (ObjOrdDb.ProcedureExecute(OraCmd) == true)
+                    return true;
+                else
+                    return false;
+            }
+            catch (Exception ex)
+            {
+                return default(Boolean);
+                //ObjCommon = new clscommon();
+                //ObjCommon.WriteErrMsg("clsSearchCheck: DeleteTransaction() : " + ex.Message);
+            }
+        }
+
+        #endregion
+
+        #region "clsHome"
+
+        public DataSet GetVarifyStatusByEmpID(long PEMPID)
+        {
+            dsInformation = new DataSet();
+            OracleCommand oraCmd = new OracleCommand("CW_GETVARIFYSTATUSBYEMPID");
+            oraCmd.CommandType = System.Data.CommandType.StoredProcedure;
+            oraCmd.Parameters.Add(new OracleParameter("PCW", OracleType.Cursor)).Direction = ParameterDirection.Output;
+            oraCmd.Parameters.Add(new OracleParameter("PEMPID", OracleType.Number)).Value = PEMPID;
+            try
+            {
+                ObjOrdDb = new clsDatabase();
+                dsInformation = ObjOrdDb.ProcedureExecuteDataset(oraCmd);
+                if ((dsInformation != null) && ((dsInformation.Tables.Count > 0) && (dsInformation.Tables[0].Rows.Count > 0)))
+                    return dsInformation;
+                else
+                    return null;
+                oraCmd.Dispose();
+            }
+            catch (Exception ex)
+            {
+                return null;
+                //ObjCommon = new clsCommon();
+                //ObjCommon.WriteErrMsg("clsHome: CW_GETVARIFYSTATUSBYEMPID() : " + ex.Message);
+            }
+            finally
+            {
+                dsInformation.Dispose();
+            }
+        }
+
+        public DataSet GetVarifyChkDetail(int PVARID)
+        {
+            dsInformation = new DataSet();
+            OracleCommand oraCmd = new OracleCommand("CW_GETVARIFYCHKDTL");
+            oraCmd.CommandType = System.Data.CommandType.StoredProcedure;
+            oraCmd.Parameters.Add(new OracleParameter("PCW", OracleType.Cursor)).Direction = ParameterDirection.Output;
+            oraCmd.Parameters.Add(new OracleParameter("PVARID", OracleType.Number)).Value = PVARID;
+            try
+            {
+                ObjOrdDb = new clsDatabase();
+                dsInformation = ObjOrdDb.ProcedureExecuteDataset(oraCmd);
+                if ((dsInformation != null) && ((dsInformation.Tables.Count > 0) && (dsInformation.Tables[0].Rows.Count > 0)))
+                    return dsInformation;
+                else
+                    return null;
+                oraCmd.Dispose();
+            }
+            catch (Exception ex)
+            {
+                return null;
+                //ObjCommon = new clsCommon();
+                //ObjCommon.WriteErrMsg("clsHome: CW_GETVARIFYCHKDTL() : " + ex.Message);
+            }
+            finally
+            {
+                dsInformation.Dispose();
+            }
+        }
+
+        #endregion
+
 
         #endregion
 
