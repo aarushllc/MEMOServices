@@ -1,0 +1,6 @@
+C:\Users\KHENGAR\Desktop\MEMOServices\MEMOServices\bin\MEMOServices.dll.config
+C:\Users\KHENGAR\Desktop\MEMOServices\MEMOServices\bin\MEMOServices.dll
+C:\Users\KHENGAR\Desktop\MEMOServices\MEMOServices\bin\MEMOServices.pdb
+C:\Users\KHENGAR\Desktop\MEMOServices\MEMOServices\obj\Debug\MEMOServices.dll
+C:\Users\KHENGAR\Desktop\MEMOServices\MEMOServices\obj\Debug\MEMOServices.pdb
+C:\Users\KHENGAR\Desktop\MEMOServices\MEMOServices\obj\Debug\MEMOServices.csprojResolveAssemblyReference.cache
