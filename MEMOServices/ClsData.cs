@@ -18,7 +18,7 @@ namespace MEMOServices
 
         #region "MEMO"
 
-        #region "ClsAdmin"
+        #region ClsAdmin
 
         public DataSet GetEmployeeList(long MoGrpID)
         {
@@ -136,227 +136,38 @@ namespace MEMOServices
             }
         }
 
-        #endregion
-
-        #region "clscommon"
-
-        public string getsysdate()
-        {
-            try
-            {
-                string SysDate = "";
-
-                clsDatabase ObjOrdDb = new clsDatabase();
-                OracleCommand oraCmd = new OracleCommand("CHK_GETSYSDATE");
-                oraCmd.CommandType = System.Data.CommandType.StoredProcedure;
-                oraCmd.Parameters.Add(new OracleParameter("pvalue", OracleType.VarChar, 2000)).Direction = ParameterDirection.Output;
-                clsDatabase objOradb = new clsDatabase();
-                try
-                {
-                    if ((ObjOrdDb.ProcedureExecutescaler(oraCmd) == true))
-                    {
-                        SysDate = oraCmd.Parameters["pvalue"].Value.ToString();
-                        return SysDate;
-                    }
-                    else
-                    {
-                        return "";
-                    }
-                }
-                catch
-                {
-                    //clsCommon.WriteError(ex.Message);
-                    return "";
-                }
-                finally
-                {
-                    oraCmd.Dispose();
-                }
-            }
-            catch
-            {
-                return "";
-            }
-        }
-
-        public void WriteErrMsg(string exMsg)
-        {
-            //try
-            //{
-            //    string directory = ModGlobal.ApplicationSettings.AppPath;
-            //    string[] Str;
-            //    Str = directory.Split("bin");
-            //    directory = Str[0] + "Error" + "\\ErrorLog.txt";
-            //    StreamWriter writer = new StreamWriter(directory, true, System.Text.Encoding.ASCII);
-            //    writer.WriteLine(exMsg + vbNewLine + DateTime.Now.ToString + vbNewLine);
-            //    writer.Close();
-            //}
-            //catch (Exception ex)
-            //{
-            //    MsgBox("Error while writing error massage. " + ex.Message, MsgBoxStyle.OkOnly, "Error");
-            //}
-        }
-
-        public DataSet GetCustData(string StrQuery)
-        {
-            try
-            {
-                OracleCommand oraCmd = new OracleCommand();
-                oraCmd.CommandType = System.Data.CommandType.Text;
-                oraCmd.CommandText = StrQuery;
-                try
-                {
-                    dsInformation = ObjOrdDb.ProcedureExecuteDataset(oraCmd);
-                    if ((dsInformation != null) && ((dsInformation.Tables.Count > 0) && (dsInformation.Tables[0].Rows.Count > 0)))
-                    {
-                        return dsInformation;
-                    }
-                    else
-                    {
-                        return null;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    //clsCommon.WriteError(ex.Message);
-                    //return ex.ToString();
-                    return null;
-                }
-                finally
-                {
-                    oraCmd.Dispose();
-                    dsInformation.Dispose();
-                }
-            }
-            catch (Exception ex)
-            {
-                //return ex.ToString();
-                return null;
-            }
-        }
-
-        public void WriteMemoEventLog(string exMsg, string Filename)
-        {
-            StreamWriter writer;
-            //try
-            //{
-            //    string LogFilename = string.Empty;
-            //    string Directory = string.Empty;
-            //    LogFilename = Filename.Trim().Replace("/", "");
-            //    if (File.Exists(ModGlobal.ApplicationSettings.MemoEventLogPath + "\\" + LogFilename + ".txt"))
-            //    {
-            //    }
-            //    else
-            //        File.Create(ModGlobal.ApplicationSettings.MemoEventLogPath + "\\" + LogFilename + ".txt");
-            //    Directory = ModGlobal.ApplicationSettings.MemoEventLogPath;
-            //    string[] Str;
-            //    Str = Directory.Split("bin");
-            //    Directory = Str[0] + "\\" + LogFilename + ".txt";
-            //    writer = new StreamWriter(Directory, true, System.Text.Encoding.ASCII);
-            //    writer.WriteLine(exMsg + vbNewLine + DateTime.Now.ToString + vbNewLine);
-            //    writer.Close();
-            //}
-            //catch (Exception ex)
-            //{
-            //    writer.Close();
-            //    MsgBox("Error while writing error massage. " + ex.Message, MsgBoxStyle.OkOnly, "Error");
-            //}
-        }
-
-        public void GetHardDiskNo()
-        {
-            //try
-            //{
-            //    string HDD = string.Empty;
-            //    string MySystemDirectory = Environment.SystemDirectory;
-            //    string MyInstallDrive = MySystemDirectory.Substring(0, 2);
-            //    ManagementObjectSearcher searcher = new ManagementObjectSearcher("SELECT * FROM Win32_DiskDrive Where Index = 0");
-            //    foreach (ManagementObject wmi_HD in searcher.Get())
-            //        HDD = HDD + wmi_HD("Signature").ToString;
-            //    try
-            //    {
-            //        ManagementObjectSearcher Searcher_L = new ManagementObjectSearcher("root\\CIMV2", "SELECT * FROM Win32_LogicalDisk WHERE DeviceID = '" + MyInstallDrive + "'");
-            //        foreach (ManagementObject queryObj in Searcher_L.Get())
-            //            HDD = HDD + queryObj("VolumeSerialNumber").ToString.Trim();
-            //    }
-            //    catch (Exception ex)
-            //    {
-            //        WriteErrMsg("An error occurred while querying for WMI data: VolumeSerialNumber " + ex.Message);
-            //    }
-
-            //    return HDD;
-            //}
-            //catch (Exception ex)
-            //{
-            //    return null;
-            //    WriteErrMsg("An error occurred while querying for WMI data: VolumeSerialNumber " + ex.Message);
-            //}
-        }
-
-        public DataSet GetRegStatusByID(string EmpID, string StoreID, string StationID)
-        {
-            dsInformation = new DataSet();
-            ObjOrdDb = new clsDatabase();
-            OracleCommand OraCmd = new OracleCommand("CW_GETREGSTATUSBYID");
-            OraCmd.CommandType = CommandType.StoredProcedure;
-            OraCmd.Parameters.Add(new OracleParameter("EMPID", OracleType.VarChar, 25)).Value = EmpID;
-            OraCmd.Parameters.Add(new OracleParameter("STATIONID", OracleType.Number)).Value = StationID;
-            OraCmd.Parameters.Add(new OracleParameter("STOREID", OracleType.Number)).Value = StoreID;
-            OraCmd.Parameters.Add(new OracleParameter("CW1", OracleType.Cursor)).Direction = ParameterDirection.Output;
-            OraCmd.Parameters.Add(new OracleParameter("CW2", OracleType.Cursor)).Direction = ParameterDirection.Output;
-            try
-            {
-                dsInformation = ObjOrdDb.ProcedureExecuteDataset(OraCmd);
-                if ((dsInformation != null) && ((dsInformation.Tables.Count > 0) && (dsInformation.Tables[0].Rows.Count > 0)))
-                    return dsInformation;
-                else
-                    return null;
-                OraCmd.Dispose();
-            }
-            catch (Exception ex)
-            {
-                //clsCommon ObjCommon = new clsCommon();
-                //ObjCommon.WriteErrMsg("clsCommon: GetRegStatusByID()" + ex.Message);
-                return null;
-            }
-            finally
-            {
-                dsInformation.Dispose();
-            }
-        }
-
-        #endregion
+        #endregion        
 
         #region "ClsLoadUnloadMO"
 
-        public void CW_MEMO_LOADMEMO(int PSTOREID, int PSTARTSEQ, int PENDSEQ, int PCURRENTSEQ, int PSTARTCHKNO, int PENDCHKNO, int PNOOFMEMOLEFT, string PISPROCESSIOG, int PCREATEDBY)
+        public bool LoadMEMO(int StoreID, int StartSeq, int EndSeq, int CurrentSeq, int StartChkNo, int EndChkNo, int NumberOfMemoLeft, string IsProcessIOG, int CreatedBy)
         {
             OracleCommand oraCmd = new OracleCommand("CW_MEMO_LOADMEMO");
             oraCmd.CommandType = System.Data.CommandType.StoredProcedure;
-            oraCmd.Parameters.Add(new OracleParameter("PSTOREID", OracleType.Number)).Value = PSTOREID;
-            oraCmd.Parameters.Add(new OracleParameter("PSTARTSEQ", OracleType.Number)).Value = PSTARTSEQ;
-            oraCmd.Parameters.Add(new OracleParameter("PENDSEQ", OracleType.Number)).Value = PENDSEQ;
-            oraCmd.Parameters.Add(new OracleParameter("PCURRENTSEQ", OracleType.Number)).Value = PCURRENTSEQ;
-            oraCmd.Parameters.Add(new OracleParameter("PSTARTCHKNO", OracleType.Number)).Value = PSTARTCHKNO;
-            oraCmd.Parameters.Add(new OracleParameter("PENDCHKNO", OracleType.Number)).Value = PENDCHKNO;
-            oraCmd.Parameters.Add(new OracleParameter("PNOOFMEMOLEFT", OracleType.Number)).Value = PNOOFMEMOLEFT;
-            oraCmd.Parameters.Add(new OracleParameter("PISPROCESSIOG", OracleType.VarChar, 2000)).Value = PISPROCESSIOG;
-            oraCmd.Parameters.Add(new OracleParameter("PCREATEDBY", OracleType.Number)).Value = PCREATEDBY;
+            oraCmd.Parameters.Add(new OracleParameter("PSTOREID", OracleType.Number)).Value = StoreID;
+            oraCmd.Parameters.Add(new OracleParameter("PSTARTSEQ", OracleType.Number)).Value = StartSeq;
+            oraCmd.Parameters.Add(new OracleParameter("PENDSEQ", OracleType.Number)).Value = EndSeq;
+            oraCmd.Parameters.Add(new OracleParameter("PCURRENTSEQ", OracleType.Number)).Value = CurrentSeq;
+            oraCmd.Parameters.Add(new OracleParameter("PSTARTCHKNO", OracleType.Number)).Value = StartChkNo;
+            oraCmd.Parameters.Add(new OracleParameter("PENDCHKNO", OracleType.Number)).Value = EndChkNo;
+            oraCmd.Parameters.Add(new OracleParameter("PNOOFMEMOLEFT", OracleType.Number)).Value = NumberOfMemoLeft;
+            oraCmd.Parameters.Add(new OracleParameter("PISPROCESSIOG", OracleType.VarChar, 2000)).Value = IsProcessIOG.ToString().Trim();
+            oraCmd.Parameters.Add(new OracleParameter("PCREATEDBY", OracleType.Number)).Value = CreatedBy;
             try
             {
                 clsDatabase objOradb = new clsDatabase();
                 if (objOradb.ProcedureExecute(oraCmd) == true)
                 {
-                    //return true;
+                    return true;
                 }
                 else
                 {
-                    //return false;
+                    return false;
                 }
             }
             catch (Exception ex)
             {
-                //return false;
+                return false;
                 //ObjCommon.WriteErrMsg(ex.Message);
             }
         }
@@ -365,7 +176,7 @@ namespace MEMOServices
 
         #region "ClsLogin"
 
-        public DataSet Login(string UserName, string Password, string SysDt)
+        public DataSet Login_RegisterStatus(string UserName, string Password, string SysDt, int StoreID, int StationID)
         {
             try
             {
@@ -373,9 +184,9 @@ namespace MEMOServices
                 oraCmd.CommandType = System.Data.CommandType.StoredProcedure;
                 oraCmd.Parameters.Add(new OracleParameter("pEMPID", OracleType.Number)).Value = System.Convert.ToInt32(UserName.ToString().Trim());
                 oraCmd.Parameters.Add(new OracleParameter("pEMPPASS", OracleType.VarChar, 2000)).Value = Password.ToString().Trim();
-                //oraCmd.Parameters.Add(new OracleParameter("pSTATIONID", OracleType.Number)).Value = ModGlobal.ApplicationSettings.Station_ID;
+                oraCmd.Parameters.Add(new OracleParameter("pSTATIONID", OracleType.Number)).Value = StationID;
                 oraCmd.Parameters.Add(new OracleParameter("pSTDT", OracleType.VarChar)).Value = SysDt;
-                //oraCmd.Parameters.Add(new OracleParameter("pSTOREID", OracleType.Number)).Value = ModGlobal.Store.Store_ID;
+                oraCmd.Parameters.Add(new OracleParameter("pSTOREID", OracleType.Number)).Value = StoreID;
                 oraCmd.Parameters.Add(new OracleParameter("pSHIFTID", OracleType.Number)).Value = 1;
                 oraCmd.Parameters.Add(new OracleParameter("pCW", OracleType.Cursor)).Direction = ParameterDirection.Output;
                 oraCmd.Parameters.Add(new OracleParameter("pCWSTATION", OracleType.Cursor)).Direction = ParameterDirection.Output;
@@ -411,7 +222,7 @@ namespace MEMOServices
             }
         }
 
-        public string Login1(string UserName, string Password, int Station, string SysDt)
+        public string Login_Employee(string UserName, string Password, int Station, string SysDt)
         {
             try
             {
@@ -462,7 +273,33 @@ namespace MEMOServices
             }
         }
 
-        public DataSet GetEmpDetails(string EmpID)
+        public DataSet Login_MO(string PassCode)
+        {
+            try
+            {
+                OracleCommand OraCmd = new OracleCommand("MO_LOGIN");
+                OraCmd.CommandType = CommandType.StoredProcedure;
+                OraCmd.Parameters.Add(new OracleParameter("pPASSCODE", OracleType.VarChar, 2000)).Value = PassCode.ToString().Trim();
+                OraCmd.Parameters.Add(new OracleParameter("pCW", OracleType.Cursor)).Direction = ParameterDirection.Output;
+
+                ObjOrdDb = new clsDatabase();
+                dsInformation = new DataSet();
+                dsInformation = ObjOrdDb.ProcedureExecuteDataset(OraCmd);
+                if ((dsInformation != null) && ((dsInformation.Tables.Count > 0) && (dsInformation.Tables[0].Rows.Count > 0)))
+                    return dsInformation;
+                else
+                    return null;
+                OraCmd.Dispose();
+            }
+            catch (Exception ex)
+            {
+                return null;
+                //ObjCommon = new clscommon();
+                //ObjCommon.WriteErrMsg("clsLogin: Login : " + ex.Message);
+            }
+        }
+
+        public DataSet GetEmpDetailsFromEmpID(string EmpID)
         {
             try
             {
@@ -476,131 +313,81 @@ namespace MEMOServices
                 if ((dsInformation != null) && ((dsInformation.Tables.Count > 0) && (dsInformation.Tables[0].Rows.Count > 0)))
                     return dsInformation;
                 else
-                    return null /* TODO Change to default(_) if this is not a reference type */;
+                    return null;
 
                 OraCmd.Dispose();
             }
             catch (Exception ex)
             {
-                return null /* TODO Change to default(_) if this is not a reference type */;
+                return null;
                 //ObjCommon = new clsCommon();
                 //ObjCommon.WriteErrMsg("clsLogin: GetEmpDetails() : " + ex.Message);
             }
 
         }
 
-        public DataSet GetStoreDetail(long Sid)
+        public DataSet GetStoreDetailFrmStoreID(long StoreID)
         {
             try
             {
                 OracleCommand OraCmd = new OracleCommand("CHK_GETSTOREDTL");
                 OraCmd.CommandType = CommandType.StoredProcedure;
-                OraCmd.Parameters.Add(new OracleParameter("SID", OracleType.Number)).Value = Sid;
+                OraCmd.Parameters.Add(new OracleParameter("SID", OracleType.Number)).Value = StoreID;
                 OraCmd.Parameters.Add(new OracleParameter("pSTORE", OracleType.Cursor)).Direction = ParameterDirection.Output;
+
                 ObjOrdDb = new clsDatabase();
                 dsInformation = new DataSet();
                 dsInformation = ObjOrdDb.ProcedureExecuteDataset(OraCmd);
                 if ((dsInformation != null) && ((dsInformation.Tables.Count > 0) && (dsInformation.Tables[0].Rows.Count > 0)))
                     return dsInformation;
                 else
-                    return null /* TODO Change to default(_) if this is not a reference type */;
+                    return null;
                 OraCmd.Dispose();
             }
             catch (Exception ex)
             {
-                return null /* TODO Change to default(_) if this is not a reference type */;
+                return null;
                 //ObjCommon = new clsCommon();
                 //ObjCommon.WriteErrMsg("clsLogin: GetStoreDetail() : " + ex.Message);
             }
         }
 
-        public DataSet MO_Login(string PassCode)
-        {
-            try
-            {
-                OracleCommand OraCmd = new OracleCommand("MO_LOGIN");
-                OraCmd.CommandType = CommandType.StoredProcedure;
-                OraCmd.Parameters.Add(new OracleParameter("pPASSCODE", OracleType.VarChar, 2000)).Value = PassCode.ToString().Trim();
-                OraCmd.Parameters.Add(new OracleParameter("pCW", OracleType.Cursor)).Direction = ParameterDirection.Output;
-                ObjOrdDb = new clsDatabase();
-                dsInformation = new DataSet();
-                dsInformation = ObjOrdDb.ProcedureExecuteDataset(OraCmd);
-                if ((dsInformation != null) && ((dsInformation.Tables.Count > 0) && (dsInformation.Tables[0].Rows.Count > 0)))
-                    return dsInformation;
-                else
-                    return null /* TODO Change to default(_) if this is not a reference type */;
-                OraCmd.Dispose();
-            }
-            catch (Exception ex)
-            {
-                return null /* TODO Change to default(_) if this is not a reference type */;
-                //ObjCommon = new clscommon();
-                //ObjCommon.WriteErrMsg("clsLogin: Login : " + ex.Message);
-            }
-        }
-
-        public DataSet GetServiceDetailForMemo()
+        public DataSet GetServiceDetailForMEMO()
         {
             try
             {
                 OracleCommand OraCmd = new OracleCommand("CW_GETSERVICESFORMEMO");
                 OraCmd.CommandType = CommandType.StoredProcedure;
                 OraCmd.Parameters.Add(new OracleParameter("pSERVICE", OracleType.Cursor)).Direction = ParameterDirection.Output;
+
                 ObjOrdDb = new clsDatabase();
                 dsInformation = new DataSet();
                 dsInformation = ObjOrdDb.ProcedureExecuteDataset(OraCmd);
                 if ((dsInformation != null) && ((dsInformation.Tables.Count > 0) && (dsInformation.Tables[0].Rows.Count > 0)))
                     return dsInformation;
                 else
-                    return null /* TODO Change to default(_) if this is not a reference type */;
+                    return null;
                 OraCmd.Dispose();
             }
             catch (Exception ex)
             {
-                return null /* TODO Change to default(_) if this is not a reference type */;
+                return null;
                 //ObjCommon = new clscommon();
                 //ObjCommon.WriteErrMsg("clsLogin: GetStoreDetail() : " + ex.Message);
             }
         }
 
-        #endregion
-
-        #region "clsMail"
-
-        public bool SendMail(string MailFrom, string MailTo, string MailSubject, string MailBody, string MailAttachment)
-        {
-            MailMessage mailMSg = new MailMessage();
-            SmtpClient SMTPserver = new SmtpClient();
-            try
-            {
-                SMTPserver.Credentials = new System.Net.NetworkCredential("prami@cwf-llc.com", "Password1");
-                SMTPserver.Port = 25;
-                SMTPserver.Host = "mail.cwf-llc.com";
-                mailMSg.From = new MailAddress(MailFrom);
-                mailMSg.To.Add(MailTo);
-                mailMSg.Subject = MailSubject;
-                mailMSg.Body = MailBody;
-                SMTPserver.Send(mailMSg);
-                return true;
-            }
-            catch (Exception ex)
-            {
-                //objComm.WriteErrMsg("clsMail : SendMail :" + ex.Message + vbNewLine + DateTime.Now.ToString + vbNewLine);
-                return false;
-            }
-        }
-
-        #endregion
+        #endregion        
 
         #region "ClsMOProcess"
 
-        public DataSet CW_MEMO_ISPROCESS(int pSTOREID)
+        public DataSet MEMO_IsProcess(int StoreID)
         {
             try
             {
                 OracleCommand oraCmd = new OracleCommand("CW_MEMO_CHKPROCESS");
                 oraCmd.CommandType = System.Data.CommandType.StoredProcedure;
-                oraCmd.Parameters.Add(new OracleParameter("pSTOREID", OracleType.Number)).Value = pSTOREID;
+                oraCmd.Parameters.Add(new OracleParameter("pSTOREID", OracleType.Number)).Value = StoreID;
                 oraCmd.Parameters.Add(new OracleParameter("GEOUT", OracleType.Cursor)).Direction = ParameterDirection.Output;
                 try
                 {
@@ -633,12 +420,12 @@ namespace MEMOServices
             }
         }
 
-        public bool UpdateIsProcessMemo(int pSTOREID, string pFLAG)
+        public bool UpdateIsProcessMEMO(int StoreID, string Flg)
         {
             OracleCommand oraCmd = new OracleCommand("CW_UPDATEMEMOISPROCESS");
             oraCmd.CommandType = System.Data.CommandType.StoredProcedure;
-            oraCmd.Parameters.Add(new OracleParameter("pSTOREID", OracleType.Number)).Value = pSTOREID;
-            oraCmd.Parameters.Add(new OracleParameter("pFLG", OracleType.VarChar, 1)).Value = pFLAG;
+            oraCmd.Parameters.Add(new OracleParameter("pSTOREID", OracleType.Number)).Value = StoreID;
+            oraCmd.Parameters.Add(new OracleParameter("pFLG", OracleType.VarChar, 1)).Value = Flg;
             try
             {
                 ObjOrdDb = new clsDatabase();
@@ -654,32 +441,32 @@ namespace MEMOServices
             }
         }
 
-        public long CW_MEMO_TRAN(int PID, int PBATCHID, int PCUSTID, System.DateTime PTRANSDT, double PTRANSAMT, long PSERIALNO, string PCREATEDBY, string PCOMPNAME, int PCHKNO, int PSTOREID, int PSTATIONID, double PFEES, int PSERVICEID, int RID, int PMODE, int TQTY, int TDISC, int ExeId)
+        public long MEMO_Transaction(int PID, int BatchID, int CustID, System.DateTime TransDate, double TransAmt, long SerialNo, string CreatedBy, string CmpName, int ChkNo, int StoreID, int StationID, double Fees, int ServiceID, int RID, int Mode, int Qty, int Disc, int ExeId, string ServiceName)
         {
             long OutVal = 0;
             DataSet DsMoProcess = new DataSet();
             OracleCommand oraCmd = new OracleCommand("CW_MEMO_TRAN");
             oraCmd.CommandType = System.Data.CommandType.StoredProcedure;
             oraCmd.Parameters.Add(new OracleParameter("PID", OracleType.Number)).Value = PID;
-            oraCmd.Parameters.Add(new OracleParameter("PBATCHID", OracleType.Number)).Value = PBATCHID;
-            oraCmd.Parameters.Add(new OracleParameter("PCUSTID", OracleType.Number)).Value = PCUSTID;
-            oraCmd.Parameters.Add(new OracleParameter("PTRANSDT", OracleType.DateTime)).Value = PTRANSDT;
-            oraCmd.Parameters.Add(new OracleParameter("PTRANSAMT", OracleType.Number)).Value = PTRANSAMT;
-            oraCmd.Parameters.Add(new OracleParameter("PSERIALNO", OracleType.Number)).Value = PSERIALNO;
-            oraCmd.Parameters.Add(new OracleParameter("PCREATEDBY", OracleType.VarChar, 2000)).Value = PCREATEDBY;
-            oraCmd.Parameters.Add(new OracleParameter("PCOMPNAME", OracleType.VarChar, 250)).Value = PCOMPNAME;
-            oraCmd.Parameters.Add(new OracleParameter("PCHKNO", OracleType.Number)).Value = PCHKNO;
-            oraCmd.Parameters.Add(new OracleParameter("PSTOREID", OracleType.Number)).Value = PSTOREID;
-            oraCmd.Parameters.Add(new OracleParameter("PSTATIONID", OracleType.Number)).Value = PSTATIONID;
-            oraCmd.Parameters.Add(new OracleParameter("PFEES", OracleType.Double)).Value = PFEES;
-            oraCmd.Parameters.Add(new OracleParameter("PSERVICEID", OracleType.Number)).Value = PSERVICEID;
+            oraCmd.Parameters.Add(new OracleParameter("PBATCHID", OracleType.Number)).Value = BatchID;
+            oraCmd.Parameters.Add(new OracleParameter("PCUSTID", OracleType.Number)).Value = CustID;
+            oraCmd.Parameters.Add(new OracleParameter("PTRANSDT", OracleType.DateTime)).Value = TransDate;
+            oraCmd.Parameters.Add(new OracleParameter("PTRANSAMT", OracleType.Number)).Value = TransAmt;
+            oraCmd.Parameters.Add(new OracleParameter("PSERIALNO", OracleType.Number)).Value = SerialNo;
+            oraCmd.Parameters.Add(new OracleParameter("PCREATEDBY", OracleType.VarChar, 2000)).Value = CreatedBy.ToString().Trim();
+            oraCmd.Parameters.Add(new OracleParameter("PCOMPNAME", OracleType.VarChar, 250)).Value = CmpName.ToString().Trim();
+            oraCmd.Parameters.Add(new OracleParameter("PCHKNO", OracleType.Number)).Value = ChkNo;
+            oraCmd.Parameters.Add(new OracleParameter("PSTOREID", OracleType.Number)).Value = StoreID;
+            oraCmd.Parameters.Add(new OracleParameter("PSTATIONID", OracleType.Number)).Value = StationID;
+            oraCmd.Parameters.Add(new OracleParameter("PFEES", OracleType.Double)).Value = Fees;
+            oraCmd.Parameters.Add(new OracleParameter("PSERVICEID", OracleType.Number)).Value = ServiceID;
             oraCmd.Parameters.Add(new OracleParameter("RID", OracleType.Number)).Value = RID;
-            oraCmd.Parameters.Add(new OracleParameter("PMODE", OracleType.Number)).Value = PMODE;
-            oraCmd.Parameters.Add(new OracleParameter("TQTY", OracleType.Number)).Value = TQTY;
-            oraCmd.Parameters.Add(new OracleParameter("TDISC", OracleType.Number)).Value = TDISC;
-            oraCmd.Parameters.Add(new OracleParameter("GTRANSID", OracleType.Number)).Direction = ParameterDirection.Output;
-            //oraCmd.Parameters.Add(new OracleParameter("PSNAME", OracleType.VarChar, 250)).Value = ModGlobal.Store.ServiceName.ToString.Trim;
+            oraCmd.Parameters.Add(new OracleParameter("PMODE", OracleType.Number)).Value = Mode;
+            oraCmd.Parameters.Add(new OracleParameter("TQTY", OracleType.Number)).Value = Qty;
+            oraCmd.Parameters.Add(new OracleParameter("TDISC", OracleType.Number)).Value = Disc;
+            oraCmd.Parameters.Add(new OracleParameter("PSNAME", OracleType.VarChar, 250)).Value = ServiceName.ToString().Trim();
             oraCmd.Parameters.Add(new OracleParameter("pEXEID", OracleType.Number)).Value = ExeId;
+            oraCmd.Parameters.Add(new OracleParameter("GTRANSID", OracleType.Number)).Direction = ParameterDirection.Output;
             try
             {
                 ObjOrdDb = new clsDatabase();
@@ -697,12 +484,12 @@ namespace MEMOServices
             }
         }
 
-        public bool InsertMEMOEVENTLOG(string EventDisc, string OperatorId)
+        public bool InsertMEMO_EventLog(string EventDisc, string OperatorId, int StoreID, int AgentID)
         {
             OracleCommand oraCmd = new OracleCommand("CW_MEMOEVENT_LOG");
             oraCmd.CommandType = System.Data.CommandType.StoredProcedure;
-            //oraCmd.Parameters.Add(new OracleParameter("pSTOREID", OracleType.Number)).Value = ModGlobal.Store.Store_ID;
-            //oraCmd.Parameters.Add(new OracleParameter("pTERMINALID", OracleType.Number)).Value = ModGlobal.Store.AgentId;
+            oraCmd.Parameters.Add(new OracleParameter("pSTOREID", OracleType.Number)).Value = StoreID;
+            oraCmd.Parameters.Add(new OracleParameter("pTERMINALID", OracleType.Number)).Value = AgentID;
             oraCmd.Parameters.Add(new OracleParameter("pEMPID", OracleType.VarChar, 2000)).Value = OperatorId;
             oraCmd.Parameters.Add(new OracleParameter("pEVENT", OracleType.VarChar, 2000)).Value = EventDisc;
             try
@@ -720,7 +507,7 @@ namespace MEMOServices
             }
         }
 
-        public DataSet GetMemoEventLog(string EventDate)
+        public DataSet GetMEMOEventLog(string EventDate)
         {
             try
             {
@@ -763,15 +550,15 @@ namespace MEMOServices
 
         #region "ClsMoReports"
 
-        public DataSet CW_MEMO_DAILYTRAN(string pSTDT, int EmpId)
+        public DataSet MEMO_DailyTransaction(string SysDate, int EmpId, int StoreID)
         {
             try
             {
                 OracleCommand oraCmd = new OracleCommand("CW_MEMO_DAILYRPT");
                 oraCmd.CommandType = System.Data.CommandType.StoredProcedure;
-                oraCmd.Parameters.Add(new OracleParameter("pSYSDATE", OracleType.VarChar)).Value = Convert.ToDateTime(pSTDT).ToString("dd-MMM-yy");
+                oraCmd.Parameters.Add(new OracleParameter("pSYSDATE", OracleType.VarChar)).Value = Convert.ToDateTime(SysDate).ToString("dd-MMM-yy");
                 oraCmd.Parameters.Add(new OracleParameter("pEmpId", OracleType.Number)).Value = EmpId;
-                //oraCmd.Parameters.Add(new OracleParameter("pStoreId", OracleType.Number)).Value = System.Convert.ToInt32(ModGlobal.Store.Store_ID);
+                oraCmd.Parameters.Add(new OracleParameter("pStoreId", OracleType.Number)).Value = StoreID;
                 oraCmd.Parameters.Add(new OracleParameter("CwOut", OracleType.Cursor)).Direction = ParameterDirection.Output;
                 oraCmd.Parameters.Add(new OracleParameter("CwOut1", OracleType.Cursor)).Direction = ParameterDirection.Output;
                 try
@@ -1289,6 +1076,224 @@ namespace MEMOServices
             {
                 return false;
                 //ObjCommon.WriteErrMsg(ex.Message);
+            }
+        }
+
+        #endregion
+
+        // Other Functions:
+
+        #region "clscommon"
+
+        public string getsysdate()
+        {
+            try
+            {
+                string SysDate = "";
+
+                clsDatabase ObjOrdDb = new clsDatabase();
+                OracleCommand oraCmd = new OracleCommand("CHK_GETSYSDATE");
+                oraCmd.CommandType = System.Data.CommandType.StoredProcedure;
+                oraCmd.Parameters.Add(new OracleParameter("pvalue", OracleType.VarChar, 2000)).Direction = ParameterDirection.Output;
+                clsDatabase objOradb = new clsDatabase();
+                try
+                {
+                    if ((ObjOrdDb.ProcedureExecutescaler(oraCmd) == true))
+                    {
+                        SysDate = oraCmd.Parameters["pvalue"].Value.ToString();
+                        return SysDate;
+                    }
+                    else
+                    {
+                        return "";
+                    }
+                }
+                catch
+                {
+                    //clsCommon.WriteError(ex.Message);
+                    return "";
+                }
+                finally
+                {
+                    oraCmd.Dispose();
+                }
+            }
+            catch
+            {
+                return "";
+            }
+        }
+
+        public void WriteErrMsg(string exMsg)
+        {
+            //try
+            //{
+            //    string directory = ModGlobal.ApplicationSettings.AppPath;
+            //    string[] Str;
+            //    Str = directory.Split("bin");
+            //    directory = Str[0] + "Error" + "\\ErrorLog.txt";
+            //    StreamWriter writer = new StreamWriter(directory, true, System.Text.Encoding.ASCII);
+            //    writer.WriteLine(exMsg + vbNewLine + DateTime.Now.ToString + vbNewLine);
+            //    writer.Close();
+            //}
+            //catch (Exception ex)
+            //{
+            //    MsgBox("Error while writing error massage. " + ex.Message, MsgBoxStyle.OkOnly, "Error");
+            //}
+        }
+
+        public DataSet GetCustData(string StrQuery)
+        {
+            try
+            {
+                OracleCommand oraCmd = new OracleCommand();
+                oraCmd.CommandType = System.Data.CommandType.Text;
+                oraCmd.CommandText = StrQuery;
+                try
+                {
+                    dsInformation = ObjOrdDb.ProcedureExecuteDataset(oraCmd);
+                    if ((dsInformation != null) && ((dsInformation.Tables.Count > 0) && (dsInformation.Tables[0].Rows.Count > 0)))
+                    {
+                        return dsInformation;
+                    }
+                    else
+                    {
+                        return null;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    //clsCommon.WriteError(ex.Message);
+                    //return ex.ToString();
+                    return null;
+                }
+                finally
+                {
+                    oraCmd.Dispose();
+                    dsInformation.Dispose();
+                }
+            }
+            catch (Exception ex)
+            {
+                //return ex.ToString();
+                return null;
+            }
+        }
+
+        public void WriteMemoEventLog(string exMsg, string Filename)
+        {
+            StreamWriter writer;
+            //try
+            //{
+            //    string LogFilename = string.Empty;
+            //    string Directory = string.Empty;
+            //    LogFilename = Filename.Trim().Replace("/", "");
+            //    if (File.Exists(ModGlobal.ApplicationSettings.MemoEventLogPath + "\\" + LogFilename + ".txt"))
+            //    {
+            //    }
+            //    else
+            //        File.Create(ModGlobal.ApplicationSettings.MemoEventLogPath + "\\" + LogFilename + ".txt");
+            //    Directory = ModGlobal.ApplicationSettings.MemoEventLogPath;
+            //    string[] Str;
+            //    Str = Directory.Split("bin");
+            //    Directory = Str[0] + "\\" + LogFilename + ".txt";
+            //    writer = new StreamWriter(Directory, true, System.Text.Encoding.ASCII);
+            //    writer.WriteLine(exMsg + vbNewLine + DateTime.Now.ToString + vbNewLine);
+            //    writer.Close();
+            //}
+            //catch (Exception ex)
+            //{
+            //    writer.Close();
+            //    MsgBox("Error while writing error massage. " + ex.Message, MsgBoxStyle.OkOnly, "Error");
+            //}
+        }
+
+        public void GetHardDiskNo()
+        {
+            //try
+            //{
+            //    string HDD = string.Empty;
+            //    string MySystemDirectory = Environment.SystemDirectory;
+            //    string MyInstallDrive = MySystemDirectory.Substring(0, 2);
+            //    ManagementObjectSearcher searcher = new ManagementObjectSearcher("SELECT * FROM Win32_DiskDrive Where Index = 0");
+            //    foreach (ManagementObject wmi_HD in searcher.Get())
+            //        HDD = HDD + wmi_HD("Signature").ToString;
+            //    try
+            //    {
+            //        ManagementObjectSearcher Searcher_L = new ManagementObjectSearcher("root\\CIMV2", "SELECT * FROM Win32_LogicalDisk WHERE DeviceID = '" + MyInstallDrive + "'");
+            //        foreach (ManagementObject queryObj in Searcher_L.Get())
+            //            HDD = HDD + queryObj("VolumeSerialNumber").ToString.Trim();
+            //    }
+            //    catch (Exception ex)
+            //    {
+            //        WriteErrMsg("An error occurred while querying for WMI data: VolumeSerialNumber " + ex.Message);
+            //    }
+
+            //    return HDD;
+            //}
+            //catch (Exception ex)
+            //{
+            //    return null;
+            //    WriteErrMsg("An error occurred while querying for WMI data: VolumeSerialNumber " + ex.Message);
+            //}
+        }
+
+        public DataSet GetRegStatusByID(string EmpID, string StoreID, string StationID)
+        {
+            dsInformation = new DataSet();
+            ObjOrdDb = new clsDatabase();
+            OracleCommand OraCmd = new OracleCommand("CW_GETREGSTATUSBYID");
+            OraCmd.CommandType = CommandType.StoredProcedure;
+            OraCmd.Parameters.Add(new OracleParameter("EMPID", OracleType.VarChar, 25)).Value = EmpID;
+            OraCmd.Parameters.Add(new OracleParameter("STATIONID", OracleType.Number)).Value = StationID;
+            OraCmd.Parameters.Add(new OracleParameter("STOREID", OracleType.Number)).Value = StoreID;
+            OraCmd.Parameters.Add(new OracleParameter("CW1", OracleType.Cursor)).Direction = ParameterDirection.Output;
+            OraCmd.Parameters.Add(new OracleParameter("CW2", OracleType.Cursor)).Direction = ParameterDirection.Output;
+            try
+            {
+                dsInformation = ObjOrdDb.ProcedureExecuteDataset(OraCmd);
+                if ((dsInformation != null) && ((dsInformation.Tables.Count > 0) && (dsInformation.Tables[0].Rows.Count > 0)))
+                    return dsInformation;
+                else
+                    return null;
+                OraCmd.Dispose();
+            }
+            catch (Exception ex)
+            {
+                //clsCommon ObjCommon = new clsCommon();
+                //ObjCommon.WriteErrMsg("clsCommon: GetRegStatusByID()" + ex.Message);
+                return null;
+            }
+            finally
+            {
+                dsInformation.Dispose();
+            }
+        }
+
+        #endregion
+
+        #region "clsMail"
+
+        public bool SendMail(string MailFrom, string MailTo, string MailSubject, string MailBody, string MailAttachment)
+        {
+            MailMessage mailMSg = new MailMessage();
+            SmtpClient SMTPserver = new SmtpClient();
+            try
+            {
+                SMTPserver.Credentials = new System.Net.NetworkCredential("prami@cwf-llc.com", "Password1");
+                SMTPserver.Port = 25;
+                SMTPserver.Host = "mail.cwf-llc.com";
+                mailMSg.From = new MailAddress(MailFrom);
+                mailMSg.To.Add(MailTo);
+                mailMSg.Subject = MailSubject;
+                mailMSg.Body = MailBody;
+                SMTPserver.Send(mailMSg);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                //objComm.WriteErrMsg("clsMail : SendMail :" + ex.Message + vbNewLine + DateTime.Now.ToString + vbNewLine);
+                return false;
             }
         }
 
@@ -2042,7 +2047,6 @@ namespace MEMOServices
         }
 
         #endregion
-
 
         #endregion
 

@@ -5,6 +5,7 @@ using System.Runtime.Serialization;
 using System.ServiceModel;
 using System.ServiceModel.Web;
 using System.Text;
+using System.Data;
 
 namespace MEMOServices
 {
@@ -12,6 +13,7 @@ namespace MEMOServices
     [ServiceContract]
     public interface IService1
     {
+        #region Default
 
         [OperationContract]
         string GetData(int value);
@@ -20,6 +22,77 @@ namespace MEMOServices
         CompositeType GetDataUsingDataContract(CompositeType composite);
 
         // TODO: Add your service operations here
+
+        #endregion
+
+        #region ClsAdmin
+
+        [OperationContract]
+        DataSet GetEmployeeList(long MoGrpID);
+
+        [OperationContract]
+        DataSet GetAllGroups();
+
+        [OperationContract]
+        bool UpdateEmpPasscode(long MoID, long EmpId, string Passcode, string Flg);
+
+        #endregion
+
+        #region ClsLoadUnloadMO
+
+        [OperationContract]
+        bool LoadMEMO(int StoreID, int StartSeq, int EndSeq, int CurrentSeq, int StartChkNo, int EndChkNo, int NumberOfMemoLeft, string IsProcessIOG, int CreatedBy);
+
+        #endregion
+
+        #region ClsLogin
+
+        [OperationContract]
+        DataSet Login_RegisterStatus(string UserName, string Password, string SysDt, int StoreID, int StationID);
+
+        [OperationContract]
+        string Login_Employee(string UserName, string Password, int Station, string SysDt);
+
+        [OperationContract]
+        DataSet Login_MO(string PassCode);
+
+        [OperationContract]
+        DataSet GetEmpDetailsFromEmpID(string EmpID);
+
+        [OperationContract]
+        DataSet GetStoreDetailFrmStoreID(long StoreID);
+
+        [OperationContract]
+        DataSet GetServiceDetailForMEMO();
+
+        #endregion
+
+        #region ClsMOProcess
+
+        [OperationContract]
+        DataSet MEMO_IsProcess(int StoreID);
+
+        [OperationContract]
+        bool UpdateIsProcessMEMO(int StoreID, string Flg);
+
+        [OperationContract]
+        long MEMO_Transaction(int PID, int BatchID, int CustID, System.DateTime TransDate, double TransAmt, long SerialNo, string CreatedBy, string CmpName, int ChkNo, int StoreID, int StationID, double Fees, int ServiceID, int RID, int Mode, int Qty, int Disc, int ExeId, string ServiceName);
+
+        [OperationContract]
+        bool InsertMEMO_EventLog(string EventDisc, string OperatorId, int StoreID, int AgentID);
+
+        [OperationContract]
+        DataSet GetMEMOEventLog(string EventDate);
+
+        #endregion
+
+        #region ClsMoReports
+
+        [OperationContract]
+        DataSet MEMO_DailyTransaction(string SysDate, int EmpId, int StoreID);
+
+        #endregion
+
     }
 
 

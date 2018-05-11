@@ -70,6 +70,7 @@
   <ItemGroup>
     <Compile Include="ClsData.cs" />
     <Compile Include="clsDatabase.cs" />
+    <Compile Include="EmailCode.cs" />
     <Compile Include="ModGlobal.cs" />
     <Compile Include="Service1.svc.cs">
       <DependentUpon>Service1.svc</DependentUpon>
