@@ -93,6 +93,35 @@ namespace MEMOServices
 
         #endregion
 
+        #region clsNewCustomer
+
+        long Insert_Update_Customer(string Cust_Name, string Cust_FName, string Cust_MName, string Cust_LName, string Cust_Add1, string Cust_Add2,
+                                string Cust_City, string Cust_State, string Cust_Zip, string Cust_Ph1, string Cust_Ph2, DateTime Cust_DOB,
+                                string LicenseID, string SSN, DateTime LicIssuedON, DateTime LicExpiredON, string CreatedBy, char IsOFACVerified,
+                                string Cust_Message, string Cust_DBA, string Cust_EIN, string Cust_Height, string Cust_Weight, char Cust_Gender,
+                                double Fees, string Cust_IDType, string Mode);
+
+        #endregion
+
+        #region clsNewCustomer
+
+        DataSet fillcustomerView();
+
+        DataSet GetCustDetail();
+
+        bool IsBadprocedure(int custid, int transid, double chkamt, string remark);
+
+        bool Recovery(int custid, int tranid, double chkamt);
+
+        bool Collected(int custid, int tranid, double chkamt);
+
+        DataSet GetCustUtilPayment(string pid);
+
+        bool UpdateUtility(string Cust_ID, string AccountNo, string UtilityCode);
+
+        bool UpdateIsProcessMEMO(string Cust_ID, string AccountNo, string UtilityCode, string Isdelete);
+
+        #endregion
     }
 
 

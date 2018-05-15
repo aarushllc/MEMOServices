@@ -596,7 +596,11 @@ namespace MEMOServices
 
         #region "clsNewCustomer"
 
-        public long SaveCustomer(string SysDt)
+        public long Insert_Update_Customer(string Cust_Name, string Cust_FName, string Cust_MName, string Cust_LName, string Cust_Add1, string Cust_Add2,
+                                string Cust_City, string Cust_State, string Cust_Zip, string Cust_Ph1, string Cust_Ph2, DateTime Cust_DOB,
+                                string LicenseID, string SSN, DateTime LicIssuedON, DateTime LicExpiredON, string CreatedBy, char IsOFACVerified,
+                                string Cust_Message, string Cust_DBA, string Cust_EIN, string Cust_Height, string Cust_Weight, char Cust_Gender,
+                                double Fees, string Cust_IDType, string Mode)
         {
             try
             {
@@ -604,90 +608,35 @@ namespace MEMOServices
                 OracleCommand OraCmd = new OracleCommand("SAVE_CUSTOMER");
                 OraCmd.CommandType = CommandType.StoredProcedure;
                 OraCmd.Parameters.Add(new OracleParameter("cMODE", OracleType.VarChar, 2000)).Value = "SAVE";
-                //OraCmd.Parameters.Add(new OracleParameter("cNAME", OracleType.VarChar, 2000)).Value = ModGlobal.Customer.Cust_Name;
-                //OraCmd.Parameters.Add(new OracleParameter("cFNAME", OracleType.VarChar, 2000)).Value = ModGlobal.Customer.Cust_FName;
-                //OraCmd.Parameters.Add(new OracleParameter("cMNAME", OracleType.VarChar, 2000)).Value = ModGlobal.Customer.Cust_MName;
-                //OraCmd.Parameters.Add(new OracleParameter("cLNAME", OracleType.VarChar, 2000)).Value = ModGlobal.Customer.Cust_Lname;
+                OraCmd.Parameters.Add(new OracleParameter("cNAME", OracleType.VarChar, 2000)).Value = Cust_Name.ToString().Trim();
+                OraCmd.Parameters.Add(new OracleParameter("cFNAME", OracleType.VarChar, 2000)).Value = Cust_FName.ToString().Trim();
+                OraCmd.Parameters.Add(new OracleParameter("cMNAME", OracleType.VarChar, 2000)).Value = Cust_MName.ToString().Trim();
+                OraCmd.Parameters.Add(new OracleParameter("cLNAME", OracleType.VarChar, 2000)).Value = Cust_LName.ToString().Trim();
                 OraCmd.Parameters.Add(new OracleParameter("cID", OracleType.Number)).Value = 0;
-                //OraCmd.Parameters.Add(new OracleParameter("cADDRESS1", OracleType.VarChar, 2000)).Value = ModGlobal.Customer.Cust_Address1;
-                //OraCmd.Parameters.Add(new OracleParameter("cADDRESS2", OracleType.VarChar, 2000)).Value = ModGlobal.Customer.Cust_Address2;
-                //OraCmd.Parameters.Add(new OracleParameter("cCITY", OracleType.VarChar, 2000)).Value = ModGlobal.Customer.Cust_City;
-                //OraCmd.Parameters.Add(new OracleParameter("cSTATE", OracleType.Char, 2)).Value = ModGlobal.Customer.Cust_State;
-                //OraCmd.Parameters.Add(new OracleParameter("cZIP", OracleType.VarChar, 2000)).Value = ModGlobal.Customer.Cust_Zip;
-                //OraCmd.Parameters.Add(new OracleParameter("cPHONE1", OracleType.VarChar, 2000)).Value = ModGlobal.Customer.Cust_Phone1;
-                //OraCmd.Parameters.Add(new OracleParameter("cPHONE2", OracleType.VarChar, 2000)).Value = ModGlobal.Customer.Cust_Phone2;
-                //OraCmd.Parameters.Add(new OracleParameter("cDOB", OracleType.DateTime)).Value = ModGlobal.Customer.Cust_DOB;
-                //OraCmd.Parameters.Add(new OracleParameter("cLICENSEID", OracleType.VarChar, 2000)).Value = ModGlobal.Customer.Cust_LicenceID;
-                //OraCmd.Parameters.Add(new OracleParameter("cSSN", OracleType.VarChar, 2000)).Value = ModGlobal.Customer.Cust_SSN;
-                //OraCmd.Parameters.Add(new OracleParameter("cLIC_ISSUEDON", OracleType.DateTime)).Value = ModGlobal.Customer.Cust_DLIssuedOn;
-                //OraCmd.Parameters.Add(new OracleParameter("cLIC_EXPIRESON", OracleType.DateTime)).Value = ModGlobal.Customer.Cust_DLExpiresOn;
-                OraCmd.Parameters.Add(new OracleParameter("cCREATED_ON", OracleType.DateTime)).Value = SysDt;
-                //OraCmd.Parameters.Add(new OracleParameter("cCREATED_BY", OracleType.VarChar, 2000)).Value = ModGlobal.Employee.Emp_ID;
-                //OraCmd.Parameters.Add(new OracleParameter("cISOFAC", OracleType.Char, 1)).Value = ModGlobal.Customer.ISOFACVERIFIED;
-                //OraCmd.Parameters.Add(new OracleParameter("cMESSAGE", OracleType.VarChar, 2000)).Value = ModGlobal.Customer.Cust_Message;
-                //OraCmd.Parameters.Add(new OracleParameter("cDBA", OracleType.VarChar, 2000)).Value = ModGlobal.Customer.Cust_DBA;
-                //OraCmd.Parameters.Add(new OracleParameter("cEIN", OracleType.VarChar, 2000)).Value = ModGlobal.Customer.Cust_EIN;
-                //OraCmd.Parameters.Add(new OracleParameter("cHEIGHT", OracleType.VarChar, 2000)).Value = ModGlobal.Customer.Cust_Height;
-                //OraCmd.Parameters.Add(new OracleParameter("cWEIGHT", OracleType.VarChar, 2000)).Value = ModGlobal.Customer.Cust_Weight;
-                //OraCmd.Parameters.Add(new OracleParameter("cSEX", OracleType.Char, 1)).Value = ModGlobal.Customer.Cust_Sex;
-                OraCmd.Parameters.Add(new OracleParameter("cFEES", OracleType.Number)).Value = System.Convert.ToDouble(20);
-                OraCmd.Parameters.Add(new OracleParameter("CUSTOMERID", OracleType.Number)).Direction = ParameterDirection.Output;
-                //OraCmd.Parameters.Add(new OracleParameter("cIDTYPE", OracleType.VarChar, 10)).Value = ModGlobal.Customer.Cust_IDType;
-                ObjOrdDb = new clsDatabase();
-                if (ObjOrdDb.ProcedureExecutescaler(OraCmd) == true)
-                {
-                    CUSTID = Convert.ToInt32(OraCmd.Parameters["GTRANSID"].Value.ToString());
-                    return CUSTID;
-                }
-                else
-                    return 0;
-                OraCmd.Dispose();
-            }
-            catch (Exception ex)
-            {
-                return 0;
-                //ObjCommon = new clsCommon();
-                //ObjCommon.WriteErrMsg("clsNewCustomer: SaveCustomer : " + ex.Message);
-            }
-        }
-
-        public long UpdateCustomer(string CName, string FName, string MName, string LName, string Add1, string Add2, string City, string State, string Zip, string PH1, string PH2, System.DateTime DOB, string LicID, string SSN, System.DateTime IssuedOn, System.DateTime ExpireOn, string OFAC, string Message, string DBA, string EIN, string Height, string Weight, string Gender, double Fees, string SysDt)
-        {
-            try
-            {
-                Int32 CUSTID = 0;
-                OracleCommand OraCmd = new OracleCommand("SAVE_CUSTOMER");
-                OraCmd.CommandType = CommandType.StoredProcedure;
-                OraCmd.Parameters.Add(new OracleParameter("cMODE", OracleType.VarChar, 2000)).Value = "UPDATE";
-                OraCmd.Parameters.Add(new OracleParameter("cNAME", OracleType.VarChar, 2000)).Value = CName.Trim().ToString();
-                OraCmd.Parameters.Add(new OracleParameter("cFNAME", OracleType.VarChar, 2000)).Value = FName.Trim().ToString();
-                OraCmd.Parameters.Add(new OracleParameter("cMNAME", OracleType.VarChar, 2000)).Value = MName.Trim().ToString();
-                OraCmd.Parameters.Add(new OracleParameter("cLNAME", OracleType.VarChar, 2000)).Value = LName.Trim().ToString();
-                //OraCmd.Parameters.Add(new OracleParameter("cID", OracleType.Number)).Value = ModGlobal.Customer.Cust_Id;
-                OraCmd.Parameters.Add(new OracleParameter("cADDRESS1", OracleType.VarChar, 2000)).Value = Add1.Trim().ToString();
-                OraCmd.Parameters.Add(new OracleParameter("cADDRESS2", OracleType.VarChar, 2000)).Value = Add2.Trim().ToString();
-                OraCmd.Parameters.Add(new OracleParameter("cCITY", OracleType.VarChar, 2000)).Value = City.Trim().ToString();
-                OraCmd.Parameters.Add(new OracleParameter("cSTATE", OracleType.Char, 2)).Value = State.Trim().ToString();
-                OraCmd.Parameters.Add(new OracleParameter("cZIP", OracleType.VarChar, 2000)).Value = Zip.Trim().ToString();
-                OraCmd.Parameters.Add(new OracleParameter("cPHONE1", OracleType.VarChar, 2000)).Value = PH1.Trim().ToString();
-                OraCmd.Parameters.Add(new OracleParameter("cPHONE2", OracleType.VarChar, 2000)).Value = PH2.Trim().ToString();
-                OraCmd.Parameters.Add(new OracleParameter("cDOB", OracleType.DateTime)).Value = DOB;
-                OraCmd.Parameters.Add(new OracleParameter("cLICENSEID", OracleType.VarChar, 2000)).Value = LicID.Trim().ToString();
-                OraCmd.Parameters.Add(new OracleParameter("cSSN", OracleType.VarChar, 2000)).Value = SSN.Trim().ToString();
-                OraCmd.Parameters.Add(new OracleParameter("cLIC_ISSUEDON", OracleType.DateTime)).Value = IssuedOn;
-                OraCmd.Parameters.Add(new OracleParameter("cLIC_EXPIRESON", OracleType.DateTime)).Value = ExpireOn;
-                OraCmd.Parameters.Add(new OracleParameter("cCREATED_ON", OracleType.DateTime)).Value = SysDt;
-                //OraCmd.Parameters.Add(new OracleParameter("cCREATED_BY", OracleType.VarChar, 2000)).Value = ModGlobal.Employee.Emp_ID;
-                OraCmd.Parameters.Add(new OracleParameter("cISOFAC", OracleType.Char, 1)).Value = OFAC.Trim().ToString();
-                OraCmd.Parameters.Add(new OracleParameter("cMESSAGE", OracleType.VarChar, 2000)).Value = Message.Trim().ToString();
-                OraCmd.Parameters.Add(new OracleParameter("cDBA", OracleType.VarChar, 2000)).Value = DBA.Trim().ToString();
-                OraCmd.Parameters.Add(new OracleParameter("cEIN", OracleType.VarChar, 2000)).Value = EIN.Trim().ToString();
-                OraCmd.Parameters.Add(new OracleParameter("cHEIGHT", OracleType.VarChar, 2000)).Value = Height.Trim().ToString();
-                OraCmd.Parameters.Add(new OracleParameter("cWEIGHT", OracleType.VarChar, 2000)).Value = Weight.Trim().ToString();
-                OraCmd.Parameters.Add(new OracleParameter("cSEX", OracleType.Char, 1)).Value = Gender.Trim().ToString();
+                OraCmd.Parameters.Add(new OracleParameter("cADDRESS1", OracleType.VarChar, 2000)).Value = Cust_Add1.ToString().Trim();
+                OraCmd.Parameters.Add(new OracleParameter("cADDRESS2", OracleType.VarChar, 2000)).Value = Cust_Add2.ToString().Trim();
+                OraCmd.Parameters.Add(new OracleParameter("cCITY", OracleType.VarChar, 2000)).Value = Cust_City.ToString().Trim();
+                OraCmd.Parameters.Add(new OracleParameter("cSTATE", OracleType.Char, 2)).Value = Cust_State.ToString().Trim();
+                OraCmd.Parameters.Add(new OracleParameter("cZIP", OracleType.VarChar, 2000)).Value = Cust_Zip.ToString().Trim();
+                OraCmd.Parameters.Add(new OracleParameter("cPHONE1", OracleType.VarChar, 2000)).Value = Cust_Ph1.ToString().Trim();
+                OraCmd.Parameters.Add(new OracleParameter("cPHONE2", OracleType.VarChar, 2000)).Value = Cust_Ph2.ToString().Trim();
+                OraCmd.Parameters.Add(new OracleParameter("cDOB", OracleType.DateTime)).Value = Cust_DOB;
+                OraCmd.Parameters.Add(new OracleParameter("cLICENSEID", OracleType.VarChar, 2000)).Value = LicenseID.ToString().Trim();
+                OraCmd.Parameters.Add(new OracleParameter("cSSN", OracleType.VarChar, 2000)).Value = SSN.ToString().Trim();
+                OraCmd.Parameters.Add(new OracleParameter("cLIC_ISSUEDON", OracleType.DateTime)).Value = LicIssuedON;
+                OraCmd.Parameters.Add(new OracleParameter("cLIC_EXPIRESON", OracleType.DateTime)).Value = LicExpiredON;
+                OraCmd.Parameters.Add(new OracleParameter("cCREATED_ON", OracleType.DateTime)).Value = System.DateTime.Now.ToString("");
+                OraCmd.Parameters.Add(new OracleParameter("cCREATED_BY", OracleType.VarChar, 2000)).Value = CreatedBy.ToString().Trim();
+                OraCmd.Parameters.Add(new OracleParameter("cISOFAC", OracleType.Char, 1)).Value = IsOFACVerified;
+                OraCmd.Parameters.Add(new OracleParameter("cMESSAGE", OracleType.VarChar, 2000)).Value = Cust_Message.ToString().Trim();
+                OraCmd.Parameters.Add(new OracleParameter("cDBA", OracleType.VarChar, 2000)).Value = Cust_DBA.ToString().Trim();
+                OraCmd.Parameters.Add(new OracleParameter("cEIN", OracleType.VarChar, 2000)).Value = Cust_EIN.ToString().Trim();
+                OraCmd.Parameters.Add(new OracleParameter("cHEIGHT", OracleType.VarChar, 2000)).Value = Cust_Height.ToString().Trim();
+                OraCmd.Parameters.Add(new OracleParameter("cWEIGHT", OracleType.VarChar, 2000)).Value = Cust_Weight.ToString().Trim();
+                OraCmd.Parameters.Add(new OracleParameter("cSEX", OracleType.Char, 1)).Value = Cust_Gender;
                 OraCmd.Parameters.Add(new OracleParameter("cFEES", OracleType.Number)).Value = Fees;
+                OraCmd.Parameters.Add(new OracleParameter("cIDTYPE", OracleType.VarChar, 10)).Value = Cust_IDType.ToString().Trim();
                 OraCmd.Parameters.Add(new OracleParameter("CUSTOMERID", OracleType.Number)).Direction = ParameterDirection.Output;
-                //OraCmd.Parameters.Add(new OracleParameter("cIDTYPE", OracleType.VarChar, 10)).Value = ModGlobal.Customer.Cust_IDType;
                 ObjOrdDb = new clsDatabase();
                 if (ObjOrdDb.ProcedureExecutescaler(OraCmd) == true)
                 {
@@ -701,8 +650,8 @@ namespace MEMOServices
             catch (Exception ex)
             {
                 return 0;
-                //ObjCommon = new clscommon();
-                //ObjCommon.WriteErrMsg("clsViewCust: UpdateCustomer : " + ex.Message);
+                //ObjCommon = new clsCommon();
+                //ObjCommon.WriteErrMsg("clsNewCustomer: SaveCustomer : " + ex.Message);
             }
         }
 
@@ -814,61 +763,6 @@ namespace MEMOServices
             }
         }
 
-        public long UpdateCustomerNew(string CName, string FName, string MName, string LName, string Add1, string Add2, string City, string State, string Zip, string PH1, string PH2, System.DateTime DOB, string LicID, string SSN, System.DateTime IssuedOn, System.DateTime ExpireOn, string OFAC, string Message, string DBA, string EIN, string Height, string Weight, string Gender, double Fees, string SysDt)
-        {
-            try
-            {
-                Int32 CUSTID = 0;
-                OracleCommand OraCmd = new OracleCommand("SAVE_CUSTOMER");
-                OraCmd.CommandType = CommandType.StoredProcedure;
-                OraCmd.Parameters.Add(new OracleParameter("cMODE", OracleType.VarChar, 2000)).Value = "UPDATE";
-                OraCmd.Parameters.Add(new OracleParameter("cNAME", OracleType.VarChar, 2000)).Value = CName.Trim().ToString();
-                OraCmd.Parameters.Add(new OracleParameter("cFNAME", OracleType.VarChar, 2000)).Value = FName.Trim().ToString();
-                OraCmd.Parameters.Add(new OracleParameter("cMNAME", OracleType.VarChar, 2000)).Value = MName.Trim().ToString();
-                OraCmd.Parameters.Add(new OracleParameter("cLNAME", OracleType.VarChar, 2000)).Value = LName.Trim().ToString();
-                //OraCmd.Parameters.Add(new OracleParameter("cID", OracleType.Number)).Value = ModGlobal.Customer.Cust_Id;
-                OraCmd.Parameters.Add(new OracleParameter("cADDRESS1", OracleType.VarChar, 2000)).Value = Add1.Trim().ToString();
-                OraCmd.Parameters.Add(new OracleParameter("cADDRESS2", OracleType.VarChar, 2000)).Value = Add2.Trim().ToString();
-                OraCmd.Parameters.Add(new OracleParameter("cCITY", OracleType.VarChar, 2000)).Value = City.Trim().ToString();
-                OraCmd.Parameters.Add(new OracleParameter("cSTATE", OracleType.Char, 2)).Value = State.Trim().ToString();
-                OraCmd.Parameters.Add(new OracleParameter("cZIP", OracleType.VarChar, 2000)).Value = Zip.Trim().ToString();
-                OraCmd.Parameters.Add(new OracleParameter("cPHONE1", OracleType.VarChar, 2000)).Value = PH1.Trim().ToString();
-                OraCmd.Parameters.Add(new OracleParameter("cPHONE2", OracleType.VarChar, 2000)).Value = PH2.Trim().ToString();
-                OraCmd.Parameters.Add(new OracleParameter("cDOB", OracleType.DateTime)).Value = DOB;
-                OraCmd.Parameters.Add(new OracleParameter("cLICENSEID", OracleType.VarChar, 2000)).Value = LicID.Trim().ToString();
-                OraCmd.Parameters.Add(new OracleParameter("cSSN", OracleType.VarChar, 2000)).Value = SSN.Trim().ToString();
-                OraCmd.Parameters.Add(new OracleParameter("cLIC_ISSUEDON", OracleType.DateTime)).Value = IssuedOn;
-                OraCmd.Parameters.Add(new OracleParameter("cLIC_EXPIRESON", OracleType.DateTime)).Value = ExpireOn;
-                OraCmd.Parameters.Add(new OracleParameter("cCREATED_ON", OracleType.DateTime)).Value = SysDt;
-                //OraCmd.Parameters.Add(new OracleParameter("cCREATED_BY", OracleType.VarChar, 2000)).Value = ModGlobal.Employee.Emp_ID;
-                OraCmd.Parameters.Add(new OracleParameter("cISOFAC", OracleType.Char, 1)).Value = OFAC.Trim().ToString();
-                OraCmd.Parameters.Add(new OracleParameter("cMESSAGE", OracleType.VarChar, 2000)).Value = Message.Trim().ToString();
-                OraCmd.Parameters.Add(new OracleParameter("cDBA", OracleType.VarChar, 2000)).Value = DBA.Trim().ToString();
-                OraCmd.Parameters.Add(new OracleParameter("cEIN", OracleType.VarChar, 2000)).Value = EIN.Trim().ToString();
-                OraCmd.Parameters.Add(new OracleParameter("cHEIGHT", OracleType.VarChar, 2000)).Value = Height.Trim().ToString();
-                OraCmd.Parameters.Add(new OracleParameter("cWEIGHT", OracleType.VarChar, 2000)).Value = Weight.Trim().ToString();
-                OraCmd.Parameters.Add(new OracleParameter("cSEX", OracleType.Char, 1)).Value = Gender.Trim().ToString();
-                OraCmd.Parameters.Add(new OracleParameter("cFEES", OracleType.Number)).Value = Fees;
-                OraCmd.Parameters.Add(new OracleParameter("CUSTOMERID", OracleType.Number)).Direction = ParameterDirection.Output;
-                //OraCmd.Parameters.Add(new OracleParameter("cIDTYPE", OracleType.VarChar, 10)).Value = ModGlobal.Customer.Cust_IDType;
-                ObjOrdDb = new clsDatabase();
-                if (ObjOrdDb.ProcedureExecutescaler(OraCmd) == true)
-                {
-                    CUSTID = Convert.ToInt32(OraCmd.Parameters["CUSTOMERID"].Value.ToString());
-                    return CUSTID;
-                }
-                else
-                    return 0;
-                OraCmd.Dispose();
-            }
-            catch (Exception ex)
-            {
-                return 0;
-                //ObjCommon = new clscommon();
-                //ObjCommon.WriteErrMsg("clsViewCust: UpdateCustomer : " + ex.Message);
-            }
-        }
-
         public bool IsBadprocedure(int custid, int transid, double chkamt, string remark)
         {
             try
@@ -940,61 +834,6 @@ namespace MEMOServices
             }
         }
 
-        public long SaveCustomerNew(string SysDt)
-        {
-            try
-            {
-                Int32 CUSTID;
-                OracleCommand OraCmd = new OracleCommand("SAVE_CUSTOMER");
-                OraCmd.CommandType = CommandType.StoredProcedure;
-                OraCmd.Parameters.Add(new OracleParameter("cMODE", OracleType.VarChar, 2000)).Value = "SAVE";
-                //OraCmd.Parameters.Add(new OracleParameter("cNAME", OracleType.VarChar, 2000)).Value = ModGlobal.Customer.Cust_Name;
-                //OraCmd.Parameters.Add(new OracleParameter("cFNAME", OracleType.VarChar, 2000)).Value = ModGlobal.Customer.Cust_FName;
-                //OraCmd.Parameters.Add(new OracleParameter("cMNAME", OracleType.VarChar, 2000)).Value = ModGlobal.Customer.Cust_MName;
-                //OraCmd.Parameters.Add(new OracleParameter("cLNAME", OracleType.VarChar, 2000)).Value = ModGlobal.Customer.Cust_LName;
-                OraCmd.Parameters.Add(new OracleParameter("cID", OracleType.Number)).Value = 0;
-                //OraCmd.Parameters.Add(new OracleParameter("cADDRESS1", OracleType.VarChar, 2000)).Value = ModGlobal.Customer.Cust_Address1;
-                //OraCmd.Parameters.Add(new OracleParameter("cADDRESS2", OracleType.VarChar, 2000)).Value = ModGlobal.Customer.Cust_Address2;
-                //OraCmd.Parameters.Add(new OracleParameter("cCITY", OracleType.VarChar, 2000)).Value = ModGlobal.Customer.Cust_City;
-                //OraCmd.Parameters.Add(new OracleParameter("cSTATE", OracleType.Char, 2)).Value = ModGlobal.Customer.Cust_State;
-                //OraCmd.Parameters.Add(new OracleParameter("cZIP", OracleType.VarChar, 2000)).Value = ModGlobal.Customer.Cust_Zip;
-                //OraCmd.Parameters.Add(new OracleParameter("cPHONE1", OracleType.VarChar, 2000)).Value = ModGlobal.Customer.Cust_Phone1;
-                //OraCmd.Parameters.Add(new OracleParameter("cPHONE2", OracleType.VarChar, 2000)).Value = ModGlobal.Customer.Cust_Phone2;
-                //OraCmd.Parameters.Add(new OracleParameter("cDOB", OracleType.DateTime)).Value = ModGlobal.Customer.Cust_DOB;
-                //OraCmd.Parameters.Add(new OracleParameter("cLICENSEID", OracleType.VarChar, 2000)).Value = ModGlobal.Customer.Cust_LicenceID;
-                OraCmd.Parameters.Add(new OracleParameter("cSSN", OracleType.VarChar, 2000)).Value = "";
-                //OraCmd.Parameters.Add(new OracleParameter("cLIC_ISSUEDON", OracleType.DateTime)).Value = ModGlobal.Customer.Cust_DLIssuedOn;
-                //OraCmd.Parameters.Add(new OracleParameter("cLIC_EXPIRESON", OracleType.DateTime)).Value = ModGlobal.Customer.Cust_DLExpiresOn;
-                OraCmd.Parameters.Add(new OracleParameter("cCREATED_ON", OracleType.DateTime)).Value = SysDt;
-                //OraCmd.Parameters.Add(new OracleParameter("cCREATED_BY", OracleType.VarChar, 2000)).Value = ModGlobal.Employee.Emp_ID;
-                //OraCmd.Parameters.Add(new OracleParameter("cISOFAC", OracleType.Char, 1)).Value = ModGlobal.Customer.ISOFACVERIFIED;
-                //OraCmd.Parameters.Add(new OracleParameter("cMESSAGE", OracleType.VarChar, 2000)).Value = ModGlobal.Customer.Cust_Message;
-                //OraCmd.Parameters.Add(new OracleParameter("cDBA", OracleType.VarChar, 2000)).Value = ModGlobal.Customer.Cust_DBA;
-                //OraCmd.Parameters.Add(new OracleParameter("cEIN", OracleType.VarChar, 2000)).Value = ModGlobal.Customer.Cust_EIN;
-                //OraCmd.Parameters.Add(new OracleParameter("cHEIGHT", OracleType.VarChar, 2000)).Value = ModGlobal.Customer.Cust_Height;
-                //OraCmd.Parameters.Add(new OracleParameter("cWEIGHT", OracleType.VarChar, 2000)).Value = ModGlobal.Customer.Cust_Weight;
-                //OraCmd.Parameters.Add(new OracleParameter("cSEX", OracleType.Char, 1)).Value = ModGlobal.Customer.Cust_Sex;
-                OraCmd.Parameters.Add(new OracleParameter("cFEES", OracleType.Number)).Value = System.Convert.ToDouble(0);
-                //OraCmd.Parameters.Add(new OracleParameter("cIDTYPE", OracleType.VarChar, 10)).Value = ModGlobal.Customer.Cust_IDType;
-                OraCmd.Parameters.Add(new OracleParameter("CUSTOMERID", OracleType.Number)).Direction = ParameterDirection.Output;
-                ObjOrdDb = new clsDatabase();
-                if (ObjOrdDb.ProcedureExecutescaler(OraCmd) == true)
-                {
-                    CUSTID = Convert.ToInt32(OraCmd.Parameters["CUSTOMERID"].Value.ToString());
-                    return CUSTID;
-                }
-                else
-                    return 0;
-                OraCmd.Dispose();
-            }
-            catch (Exception ex)
-            {
-                return 0;
-                //ObjCommon = new clscommon();
-                //ObjCommon.WriteErrMsg("clsTransaction: SaveCustomer : " + ex.Message);
-            }
-        }
-
         public DataSet GetCustUtilPayment(string pid)
         {
             try
@@ -1034,13 +873,13 @@ namespace MEMOServices
             }
         }
 
-        public bool UpdateUtility(string pCust_ID, string pAccountNo, string pUtilityCode)
+        public bool UpdateUtility(string Cust_ID, string AccountNo, string UtilityCode)
         {
             OracleCommand oraCmd = new OracleCommand("GE_PRC_UPDATEUTILITY");
             oraCmd.CommandType = System.Data.CommandType.StoredProcedure;
-            oraCmd.Parameters.Add(new OracleParameter("pCust_ID", OracleType.VarChar)).Value = pCust_ID;
-            oraCmd.Parameters.Add(new OracleParameter("pAccountNo", OracleType.VarChar)).Value = pAccountNo;
-            oraCmd.Parameters.Add(new OracleParameter("pUtilCode", OracleType.VarChar)).Value = pUtilityCode;
+            oraCmd.Parameters.Add(new OracleParameter("pCust_ID", OracleType.VarChar)).Value = Cust_ID.ToString().Trim();
+            oraCmd.Parameters.Add(new OracleParameter("pAccountNo", OracleType.VarChar)).Value = AccountNo.ToString().Trim();
+            oraCmd.Parameters.Add(new OracleParameter("pUtilCode", OracleType.VarChar)).Value = UtilityCode.ToString().Trim();
             try
             {
                 ObjOrdDb = new clsDatabase();
@@ -1056,14 +895,14 @@ namespace MEMOServices
             }
         }
 
-        public bool UpdateCustomerUtility(string pCust_ID, string pAccountNo, string pUtilityCode, string pIsdelete)
+        public bool UpdateCustomerUtility(string Cust_ID, string AccountNo, string UtilityCode, string Isdelete)
         {
             OracleCommand oraCmd = new OracleCommand("GE_PRC_UPDATECUSTOMERUTILITY");
             oraCmd.CommandType = System.Data.CommandType.StoredProcedure;
-            oraCmd.Parameters.Add(new OracleParameter("pCust_ID", OracleType.VarChar)).Value = pCust_ID;
-            oraCmd.Parameters.Add(new OracleParameter("pAccountNo", OracleType.VarChar)).Value = pAccountNo;
-            oraCmd.Parameters.Add(new OracleParameter("pUtilCode", OracleType.VarChar)).Value = pUtilityCode;
-            oraCmd.Parameters.Add(new OracleParameter("pIsDelete", OracleType.VarChar)).Value = pIsdelete;
+            oraCmd.Parameters.Add(new OracleParameter("pCust_ID", OracleType.VarChar)).Value = Cust_ID.ToString().Trim();
+            oraCmd.Parameters.Add(new OracleParameter("pAccountNo", OracleType.VarChar)).Value = AccountNo.ToString().Trim();
+            oraCmd.Parameters.Add(new OracleParameter("pUtilCode", OracleType.VarChar)).Value = UtilityCode.ToString().Trim();
+            oraCmd.Parameters.Add(new OracleParameter("pIsDelete", OracleType.VarChar)).Value = Isdelete.ToString().Trim();
             try
             {
                 ObjOrdDb = new clsDatabase();

@@ -636,6 +636,242 @@ namespace MEMOServices
 
         #region clsNewCustomer
 
+        public long Insert_Update_Customer(string Cust_Name, string Cust_FName, string Cust_MName, string Cust_LName, string Cust_Add1, string Cust_Add2,
+                                string Cust_City, string Cust_State, string Cust_Zip, string Cust_Ph1, string Cust_Ph2, DateTime Cust_DOB,
+                                string LicenseID, string SSN, DateTime LicIssuedON, DateTime LicExpiredON, string CreatedBy, char IsOFACVerified,
+                                string Cust_Message, string Cust_DBA, string Cust_EIN, string Cust_Height, string Cust_Weight, char Cust_Gender,
+                                double Fees, string Cust_IDType, string Mode)
+        {
+            try
+            {
+                long ReturnVal = 0;
+                objData = new ClsData();
+
+                //ReturnVal = objData.Insert_Update_Customer(Cust_Name, Cust_FName, Cust_MName, Cust_LName, Cust_Add1, Cust_Add2, Cust_City, Cust_State, Cust_Zip, Cust_Ph1, Cust_Ph2, Cust_DOB, LicenseID, SSN, LicIssuedON, LicExpiredON, CreatedBy, IsOFACVerified, Cust_Message, Cust_DBA, Cust_EIN, Cust_Height, Cust_Weight, Cust_Gender, Cust_IDType, Mode);
+
+                if (ReturnVal > 0)
+                {
+                    return ReturnVal;
+                }
+                else
+                {
+                    return 0;
+                }
+            }
+            catch (Exception ex)
+            {
+                return 0;
+            }
+        }
+
+        #endregion
+
+        #region clsNewCustomer
+
+        public DataSet fillcustomerView()
+        {
+            objData = new ClsData();
+            DataSet dsAIPLData = new DataSet("AIPLData");
+            try
+            {
+                if ((dtResult.Columns.Count == 0))
+                {
+                    dtResult.Columns.Add("Result");
+                    dtResult.Columns.Add("Code");
+                    dtResult.Columns.Add("Description");
+                    dtResult.Rows.Add();
+                }
+
+                dsAIPLData = objData.fillcustomerView();
+                if (dsAIPLData != null)
+                {
+                    dtResult.Rows[0]["Result"] = "A";
+                    dtResult.Rows[0]["Code"] = "000";
+                    dtResult.Rows[0]["Description"] = "Success";
+                    dtResult.AcceptChanges();
+
+                    dsAIPLData.Tables.Add(dtResult.Copy());
+                    dsAIPLData.Tables[0].TableName = "tblCust";
+                }
+                else
+                {
+                    dtResult.Rows[0]["Result"] = "R";
+                    dtResult.Rows[0]["Code"] = "001";
+                    dtResult.Rows[0]["Description"] = "No Data Found";
+                    dtResult.AcceptChanges();
+                    dsAIPLData = new DataSet();
+                    dsAIPLData.Tables.Add(dtResult.Copy());
+                }
+                return dsAIPLData;
+            }
+            catch (Exception ex)
+            {
+                SendEMail(ErrorMailSendTo, "fillcustomerView", ex.Message.ToString());
+                return null;
+            }
+        }
+
+        public DataSet GetCustDetail()
+        {
+            objData = new ClsData();
+            DataSet dsAIPLData = new DataSet("AIPLData");
+            try
+            {
+                if ((dtResult.Columns.Count == 0))
+                {
+                    dtResult.Columns.Add("Result");
+                    dtResult.Columns.Add("Code");
+                    dtResult.Columns.Add("Description");
+                    dtResult.Rows.Add();
+                }
+
+                dsAIPLData = objData.GetCustDetail();
+                if (dsAIPLData != null)
+                {
+                    dtResult.Rows[0]["Result"] = "A";
+                    dtResult.Rows[0]["Code"] = "000";
+                    dtResult.Rows[0]["Description"] = "Success";
+                    dtResult.AcceptChanges();
+
+                    dsAIPLData.Tables.Add(dtResult.Copy());
+                    dsAIPLData.Tables[0].TableName = "tblCustDtl";
+                }
+                else
+                {
+                    dtResult.Rows[0]["Result"] = "R";
+                    dtResult.Rows[0]["Code"] = "001";
+                    dtResult.Rows[0]["Description"] = "No Data Found";
+                    dtResult.AcceptChanges();
+                    dsAIPLData = new DataSet();
+                    dsAIPLData.Tables.Add(dtResult.Copy());
+                }
+                return dsAIPLData;
+            }
+            catch (Exception ex)
+            {
+                SendEMail(ErrorMailSendTo, "GetCustDetail", ex.Message.ToString());
+                return null;
+            }
+        }
+
+        public bool IsBadprocedure(int custid, int transid, double chkamt, string remark)
+        {
+            objData = new ClsData();
+            bool OutFlg = objData.IsBadprocedure(custid, transid, chkamt, remark);
+
+            if (OutFlg == true)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public bool Recovery(int custid, int tranid, double chkamt)
+        {
+            objData = new ClsData();
+            bool OutFlg = objData.Recovery(custid, tranid, chkamt);
+
+            if (OutFlg == true)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public bool Collected(int custid, int tranid, double chkamt)
+        {
+            objData = new ClsData();
+            bool OutFlg = objData.Collected(custid, tranid, chkamt);
+
+            if (OutFlg == true)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public DataSet GetCustUtilPayment(string pid)
+        {
+            objData = new ClsData();
+            DataSet dsAIPLData = new DataSet("AIPLData");
+            try
+            {
+                if ((dtResult.Columns.Count == 0))
+                {
+                    dtResult.Columns.Add("Result");
+                    dtResult.Columns.Add("Code");
+                    dtResult.Columns.Add("Description");
+                    dtResult.Rows.Add();
+                }
+
+                dsAIPLData = objData.GetCustUtilPayment(pid);
+                if (dsAIPLData != null)
+                {
+                    dtResult.Rows[0]["Result"] = "A";
+                    dtResult.Rows[0]["Code"] = "000";
+                    dtResult.Rows[0]["Description"] = "Success";
+                    dtResult.AcceptChanges();
+
+                    dsAIPLData.Tables.Add(dtResult.Copy());
+                    dsAIPLData.Tables[0].TableName = "tblCustDtl";
+                }
+                else
+                {
+                    dtResult.Rows[0]["Result"] = "R";
+                    dtResult.Rows[0]["Code"] = "001";
+                    dtResult.Rows[0]["Description"] = "No Data Found";
+                    dtResult.AcceptChanges();
+                    dsAIPLData = new DataSet();
+                    dsAIPLData.Tables.Add(dtResult.Copy());
+                }
+                return dsAIPLData;
+            }
+            catch (Exception ex)
+            {
+                SendEMail(ErrorMailSendTo, "GetCustUtilPayment", ex.Message.ToString());
+                return null;
+            }
+        }
+
+        public bool UpdateUtility(string Cust_ID, string AccountNo, string UtilityCode)
+        {
+            objData = new ClsData();
+            bool OutFlg = objData.UpdateUtility(Cust_ID, AccountNo, UtilityCode);
+
+            if (OutFlg == true)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public bool UpdateIsProcessMEMO(string Cust_ID, string AccountNo, string UtilityCode, string Isdelete)
+        {
+            objData = new ClsData();
+            bool OutFlg = objData.UpdateCustomerUtility(Cust_ID, AccountNo, UtilityCode, Isdelete);
+
+            if (OutFlg == true)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
         #endregion
 
         #region GeneralFunctions
